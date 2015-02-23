@@ -1,10 +1,13 @@
 package unitTests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import contactManager.Contact;
+import contactManager.ContactImpl;
 
 /**
  * Testing the Contact class.
@@ -42,15 +45,16 @@ public class TestContact {
 	/**
 	 * Initialize contact for each test.
 	 */
-	@Test
+	@Before
 	public void before() {
-		this.contact = new ContactImpl(NAME);
+		this.contact = new ContactImpl(ID,NAME);
 		this.contact.addNotes(NOTES);
 	}
 	
 	/**
 	 * Test that the name is returned as expected.
 	 */
+	@Test
 	public void testName() {
 		String foundName = contact.getName();
 		assertEquals(NAME, foundName);
@@ -59,6 +63,7 @@ public class TestContact {
 	/**
 	 * Test that the notes are empty.
 	 */
+	@Test
 	public void testEmptyNotes() {
 		String foundNotes = contact.getNotes();
 		assertEquals(EMPTY_NOTES, foundNotes);
@@ -67,7 +72,8 @@ public class TestContact {
 	/**
 	 * Test addNotes.
 	 */
-	private void testAddNotes() {
+	@Test
+	public void testAddNotes() {
 		contact.addNotes(NOTES);
 		String foundNotes = contact.getNotes();
 		assertEquals(NOTES,foundNotes);
@@ -76,7 +82,8 @@ public class TestContact {
 	/**
 	 * Test that the first ID was created.
 	 */
-	private void testFirstId() {
+	@Test
+	public void testFirstId() {
 		Integer Id = contact.getId();
 		assertTrue(ID == Id);
 	}
