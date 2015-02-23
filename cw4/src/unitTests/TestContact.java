@@ -48,7 +48,6 @@ public class TestContact {
 	@Before
 	public void before() {
 		this.contact = new ContactImpl(ID,NAME);
-		this.contact.addNotes(NOTES);
 	}
 	
 	/**
