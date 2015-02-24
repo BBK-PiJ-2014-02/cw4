@@ -10,7 +10,7 @@ import contactManager.Contact;
 import contactManager.ContactImpl;
 
 /**
- * Testing the Contact class.
+ * Unit test to test the ContactImpl class.
  * 
  * @author Vasco
  *
