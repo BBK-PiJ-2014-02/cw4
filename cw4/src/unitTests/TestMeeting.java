@@ -44,9 +44,10 @@ public class TestMeeting {
 	
 	/**
 	 * Needed initializations before each test.
+	 * @throws Exception 
 	 */
 	@Before
-	public void before() {
+	public void before() throws Exception {
 		// Initialize DATE
 		DATE = new GregorianCalendar();
 		DATE.set(Calendar.YEAR, Calendar.MONTH, Calendar.DATE, Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND);
@@ -100,9 +101,10 @@ public class TestMeeting {
 	
 	/**
 	 * It is not possible to setup a Meeting with an empty list of contacts.
+	 * @throws Exception on empty contact list
 	 */
 	@Test(expected=Exception.class)
-	public void testEmptyContactList() {
+	public void testEmptyContactList() throws Exception {
 		Set<Contact> emptyContactList = new HashSet<Contact>();
 		meeting = new MeetingImpl(ID, DATE, emptyContactList);
 	}
