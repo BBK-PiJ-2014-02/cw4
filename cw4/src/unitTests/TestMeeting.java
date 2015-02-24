@@ -1,7 +1,6 @@
 package unitTests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -86,5 +85,25 @@ public class TestMeeting {
 	public void testContactList() {
 		Set<Contact> contactListFound = meeting.getContacts();
 		assertEquals(CONTACTS, contactListFound);
+	}
+	
+	/**
+	 * Testing if a different set of contacts is returned.
+	 */
+	@Test
+	public void testDifferentContactList() {
+		Set<Contact> contactListFound = meeting.getContacts();
+		Set<Contact> differentContactList = new HashSet<Contact>();
+		differentContactList.add(new ContactImpl(123, "I am a new contact"));
+		assertNotEquals(differentContactList, contactListFound);
+	}
+	
+	/**
+	 * It is not possible to setup a Meeting with an empty list of contacts.
+	 */
+	@Test(expected=Exception.class)
+	public void testEmptyContactList() {
+		Set<Contact> emptyContactList = new HashSet<Contact>();
+		meeting = new MeetingImpl(ID, DATE, emptyContactList);
 	}
 }
