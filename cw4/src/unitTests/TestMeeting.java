@@ -43,7 +43,7 @@ public class TestMeeting {
 	private Set<Contact> CONTACTS;
 	
 	/**
-	 * Needed initializations before each test.
+	 * Needed initialisations before each test.
 	 * @throws Exception 
 	 */
 	@Before
