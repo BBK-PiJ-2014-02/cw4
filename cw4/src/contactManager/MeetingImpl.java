@@ -34,7 +34,7 @@ public class MeetingImpl implements Meeting {
 	 * @throws Exception on empty contact set
 	 */
 	public MeetingImpl(int id, Calendar date, Set<Contact> contacts) throws Exception {
-        // Cannot allow empty contacts to be added as per interface specs.
+        // Cannot allow empty contacts to be added as per interface specifications.
 		if ( contacts.isEmpty() ) throw new Exception("Cannot create Meeting with an empty contact list");
 		
 	    this.id       = id;
