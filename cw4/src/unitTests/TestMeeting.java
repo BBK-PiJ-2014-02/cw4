@@ -38,6 +38,11 @@ public class TestMeeting {
 	private Calendar DATE;
 	
 	/**
+	 * The Meeting NOTES
+	 */
+	private String NOTES = "Some notes";
+	
+	/**
 	 * The default contact list
 	 */
 	private Set<Contact> CONTACTS;
@@ -48,16 +53,16 @@ public class TestMeeting {
 	 */
 	@Before
 	public void before() throws Exception {
-		// Initialize DATE
+		// Initialise DATE
 		DATE = new GregorianCalendar();
 		DATE.set(Calendar.YEAR, Calendar.MONTH, Calendar.DATE, Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND);
 		
 		// Add some random contacts expected to be returned later
 		CONTACTS = new HashSet<Contact>();
-		CONTACTS.add(new ContactImpl(0, "First contact"));
-		CONTACTS.add(new ContactImpl(1, "Second contact"));
+		CONTACTS.add(new ContactImpl(0, "First contact", null));
+		CONTACTS.add(new ContactImpl(1, "Second contact", NOTES));
 		
-		// Initialize meeting
+		// Initialise meeting
 		meeting = new MeetingImpl(ID, DATE, CONTACTS);
 	}
 
@@ -95,7 +100,7 @@ public class TestMeeting {
 	public void testDifferentContactList() {
 		Set<Contact> contactListFound = meeting.getContacts();
 		Set<Contact> differentContactList = new HashSet<Contact>();
-		differentContactList.add(new ContactImpl(123, "I am a new contact"));
+		differentContactList.add(new ContactImpl(123, "I am a new contact","Some other notes"));
 		assertNotEquals(differentContactList, contactListFound);
 	}
 	
