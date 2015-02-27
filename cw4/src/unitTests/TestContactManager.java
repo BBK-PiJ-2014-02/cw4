@@ -1,8 +1,14 @@
 package unitTests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import contactManager.Contact;
 import contactManager.ContactManager;
 import contactManager.ContactManagerImpl;
 
@@ -19,6 +25,21 @@ public class TestContactManager {
 	 * Null Contact name.
 	 */
 	private final String NULL_NAME = null;
+	
+	/**
+	 * Contact name for multiple result search.
+	 */
+	private final String CONTACT_NAME_MULTIPLE_SEARCH_RESULT = "John";
+	
+	/**
+	 * Contact name for a single result search.
+	 */
+	private final String CONTACT_NAME_SINGLE_SEARCH_RESULT = "Zchweski Ywmeylt";
+	
+	/**
+	 * Not real contact id
+	 */
+	private final int CONTACT_ID_NOT_REAL = 123;
 	
 	/**
 	 * The ContactManager testing object handler.
@@ -291,14 +312,27 @@ public class TestContactManager {
 	/** 
 	 * Check if exception is thrown on an id that does not correspond to a real contact. 
 	 */ 
-//	@Test(expected=IllegalArgumentException.class)
-	public void testGetContactsByIdNonRealContact() { }
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetContactsByIdNonRealContact() { 
+		contactManager.getContacts(CONTACT_ID_NOT_REAL);
+	}
 	
 	/** 
 	 * Check if expected list of contacts is returned from the given name string.
 	 */ 
 //	@Test
 	public void testGetContactsByName() { }
+	
+	/** 
+	 * Check if the one and only contact is returned from the given name string.
+	 */ 
+	@Test
+	public void testGetContactsByNameSingleResult() { 
+		Set<Contact> singleFound = contactManager.getContacts(CONTACT_NAME_SINGLE_SEARCH_RESULT);
+		assertTrue(singleFound.size() == 1);
+		Contact contactFound = singleFound.iterator().next();
+	    assertEquals(CONTACT_NAME_SINGLE_SEARCH_RESULT,contactFound.getName());
+	}
 	
 	/** 
 	 * Check if exception is thrown on a null parameter.
