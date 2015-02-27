@@ -43,11 +43,11 @@ public class TestContact {
 	private int ID = 1;
 
 	/**
-	 * Initialize contact for each test.
+	 * Initialise contact for each test.
 	 */
 	@Before
 	public void before() {
-		this.contact = new ContactImpl(ID,NAME);
+		this.contact = new ContactImpl(ID,NAME,NOTES);
 	}
 	
 	/**
@@ -64,6 +64,17 @@ public class TestContact {
 	 */
 	@Test
 	public void testEmptyNotes() {
+		Contact contact = new ContactImpl(ID, NAME, "");
+		String foundNotes = contact.getNotes();
+		assertEquals(EMPTY_NOTES, foundNotes);
+	}
+	
+	/**
+	 * Test that the notes are empty.
+	 */
+	@Test
+	public void testNullNotes() {
+		Contact contact = new ContactImpl(ID, NAME, null);
 		String foundNotes = contact.getNotes();
 		assertEquals(EMPTY_NOTES, foundNotes);
 	}
