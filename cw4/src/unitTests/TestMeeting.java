@@ -38,7 +38,7 @@ public class TestMeeting {
 	private Calendar DATE;
 	
 	/**
-	 * The Meeting NOTES
+	 * The Contact NOTES
 	 */
 	private String NOTES = "Some notes";
 	
