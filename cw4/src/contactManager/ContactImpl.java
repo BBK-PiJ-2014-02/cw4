@@ -20,16 +20,21 @@ public class ContactImpl implements Contact {
 	/**
 	 * Contact notes.
 	 */
-	private String notes = "";
+	private String notes;
 
 	/**
 	 * Constructor.
 	 * 
+	 * @param id the contact's id
 	 * @param name the contact's name
+	 * @param notes the contact's notes
 	 */
-	public ContactImpl(int id, String name) {
-		this.name  = name;
+	public ContactImpl(int id, String name, String notes) {
 		this.id    = id;
+		this.name  = name;
+		this.notes = notes;
+		// If supplied notes are null, set empty string.
+		if ( this.notes == null ) this.notes = "";
 	}
 	
 	/**
@@ -63,5 +68,4 @@ public class ContactImpl implements Contact {
 	public void addNotes(String notes) {
 		this.notes = notes;
 	}
-
 }
