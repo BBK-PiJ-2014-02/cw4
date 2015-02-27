@@ -64,11 +64,11 @@ public class TestPastMeeting {
 		// Initialise DATE
 		DATE = new GregorianCalendar();
 		DATE.set(Calendar.YEAR, Calendar.MONTH, Calendar.DATE, Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND);
-		
+
 		// Add some random contacts expected to be returned later
 		contactList = new HashSet<Contact>();
-		contactList.add(new ContactImpl(0, "First contact"));
-		contactList.add(new ContactImpl(1, "Second contact"));
+		contactList.add(new ContactImpl(0, "First contact", null));
+		contactList.add(new ContactImpl(1, "Second contact", NOTES));
 		
 		// Initialise meeting
 		pastMeeting = new PastMeetingImpl(ID, DATE, contactList, NOTES);
@@ -80,17 +80,6 @@ public class TestPastMeeting {
 	@Test
 	public void testNullNotes() {
 		PastMeeting pm = new PastMeetingImpl(ID, DATE, contactList, null);
-		String foundNotes = pm.getNotes();
-		String expectedNotes = "";
-		assertEquals(expectedNotes,foundNotes);
-	}
-
-	/**
-	 * Testing absence of notes at the constructor level.
-	 */
-	@Test
-	public void testAbsentNotes() {
-		PastMeeting pm = new PastMeetingImpl(ID, DATE, contactList);
 		String foundNotes = pm.getNotes();
 		String expectedNotes = "";
 		assertEquals(expectedNotes,foundNotes);
