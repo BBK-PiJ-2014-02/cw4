@@ -116,6 +116,11 @@ public class TestContactManager {
     private final int MEETING_ID = 1;
 
     /**
+     * The default Meeting notes
+     */
+    private final String MEETING_NOTES = "Default meeting notes";
+
+    /**
      * Non existent Meeting id
      */
     private final int MEETING_NOT_EXISTING_ID = 123;
@@ -375,6 +380,14 @@ public class TestContactManager {
     }
 
     /** 
+     * Test exception when meeting does not exist.
+     */ 
+    @Test(expected=IllegalArgumentException.class)
+    public void testAddMeetingNotesMeetingNonExisting() { 
+    	contactManager.addMeetingNotes(MEETING_NOT_EXISTING_ID, MEETING_NOTES);
+    }
+    
+    /** 
      * Test if a future meeting was converted to a PastMeeting after adding notes.
      */ 
 //    @Test
@@ -391,12 +404,6 @@ public class TestContactManager {
      */ 
 //    @Test
     public void testAddMeetingNotesPastMeeting() { }
-    
-    /** 
-     * Test exception when meeting does not exist.
-     */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testAddMeetingNotesMeetingNonExisting() { }
     
     /** 
      * Test exception on a meeting set in the future.
