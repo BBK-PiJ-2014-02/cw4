@@ -28,31 +28,43 @@ public class TestContactManager {
      * Null Contact name.
      */
     private final String NULL_NAME = null;
+
     
-    /**
-     * Contact name for multiple result search.
-     */
-    private final String CONTACT_NAME_MULTIPLE_SEARCH_RESULT = "John";
-    
-    /**
-     * Contact name for a single result search.
-     */
-    private final String CONTACT_NAME_SINGLE_SEARCH_RESULT = "Zchweski Ywmeylt";
-    
+    // *************************** SINGLE SEARCH CONTACT *************************** //
     /**
      * Contact id for the single search result.
      */
     private final int CONTACT_ID_SINGLE_SEARCH_RESULT = 1;
     
     /**
-     * Not real contact id
+     * Contact name for a single result search.
      */
-    private final int CONTACT_ID_NOT_REAL = 123;
+    private final String CONTACT_NAME_SINGLE_SEARCH_RESULT = "Zchweski Ywmeylt";
+    
+    
+    // ************************** MULTIPLE SEARCH CONTACT ************************** //
+    /**
+     * Contact name for multiple result search.
+     */
+    private final String CONTACT_NAME_MULTIPLE_SEARCH_RESULT = "John";
     
     /**
-     * New contact to be added, not in the list.
+     * Contact id for the multiple search result.
      */
-    private final String CONTACT_NAME_NEW = "John New Smith";
+    private final int CONTACT_ID_MULTIPLE_SEARCH_RESULT = 2;
+    
+    /**
+     * The multiple contact list expected to be returned when searching
+     * for contacts using the contact name for multiple search results.
+     */
+    private Set<Contact> multipleContactList = new HashSet<Contact>();
+    
+    
+    // ********************************* NEW CONTACT ******************************* //
+    /**
+     * Not real contact id.
+     */
+    private final int CONTACT_ID_NOT_REAL = 123;
     
     /**
      * New contact id.
@@ -60,9 +72,15 @@ public class TestContactManager {
     private final int CONTACT_ID_NEW = 1234;
     
     /**
+     * New contact to be added, not in the list.
+     */
+    private final String CONTACT_NAME_NEW = "John New Smith";
+    
+    /**
      * New contact notes.
      */
     private final String CONTACT_NOTES_NEW = "This is a new contact";
+
     /**
      * The full contact list available.
      */
@@ -80,8 +98,19 @@ public class TestContactManager {
      */
     @Before
     public void before() {
-        contactList.add(new ContactImpl(CONTACT_ID_SINGLE_SEARCH_RESULT, CONTACT_NAME_SINGLE_SEARCH_RESULT, null));
-        contactList.add(new ContactImpl(CONTACT_ID_SINGLE_SEARCH_RESULT, CONTACT_NAME_MULTIPLE_SEARCH_RESULT, null));
+        // Adding all contacts existing to the contactList to be acted upon.
+        contactList.add(new ContactImpl(CONTACT_ID_SINGLE_SEARCH_RESULT, 
+                CONTACT_NAME_SINGLE_SEARCH_RESULT, null));
+        contactList.add(new ContactImpl(CONTACT_ID_SINGLE_SEARCH_RESULT, 
+                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, null));
+
+        // The multiple list search result expected.
+        multipleContactList.add(new ContactImpl(CONTACT_ID_MULTIPLE_SEARCH_RESULT, 
+                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, CONTACT_NOTES_NEW));
+        multipleContactList.add(new ContactImpl(CONTACT_ID_NEW, CONTACT_NAME_NEW, 
+                CONTACT_NOTES_NEW));
+
+        // Initialising contactManager.
         contactManager = new ContactManagerImpl();
     }
     
@@ -378,8 +407,11 @@ public class TestContactManager {
     /** 
      * Check if expected list of contacts is returned from the given name string.
      */ 
-//    @Test
-    public void testGetContactsByName() { }
+    @Test
+    public void testGetContactsByName() { 
+        Set<Contact> foundContactList = contactManager.getContacts(CONTACT_NAME_MULTIPLE_SEARCH_RESULT);
+        assertEquals(multipleContactList,foundContactList);
+    }
     
     /** 
      * Check if the one and only contact is returned from the given name string.
