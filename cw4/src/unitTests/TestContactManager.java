@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.junit.Before;
@@ -109,6 +108,7 @@ public class TestContactManager {
     private ContactManager contactManager;
 
     
+    // ********************************** BEFORE ********************************* //
     /**
      * Loading all needed values to be ready for each test.
      */
@@ -129,237 +129,10 @@ public class TestContactManager {
         // Initialising contactManager.
         contactManager = new ContactManagerImpl();
     }
-    
-    
-    /** 
-     * Testing if a new meeting to be held in the future was added. 
-     */ 
-//    @Test
-    public void testAddFutureMeeting() { }
-    
-    /** 
-     * Testing if a new meeting to be held in the future was tried to be added in the past. 
-     */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testAddFutureMeetingWithPastDate() { }
-    
-    /** 
-     * Testing if any contact is unknown when adding a future meeting.
-     */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testAddFutureMeetingWithUnknownContact() { }
-    
-    /** 
-     * Testing if any contact is non-existent when adding a future meeting.
-     */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testAddFutureMeetingWithNonExistentContact() { }
-    
-    /**
-    * Check if the PAST meeting with the requested ID is returned.
-    */ 
-//    @Test
-    public void testGetPastMeetingId(){    }
-    
-    /**
-    * Check if the non existing PAST meeting with a requested ID returns null.
-    */ 
-//    @Test
-    public void testGetPastMeetingIdNull(){    }
-    
-    /**
-    * Check exception is thrown if there is a meeting with that ID happening in the future 
-    */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testGetPastMeetingIdInTheFuture(){    }
-    
-    /** 
-     * Test if FUTURE meeting is returned with the requested ID
-     */ 
-//    @Test
-    public void testGetFutureMeetingId() { }
-    
-    /** 
-     * Test if null if no future meeting found for given id.
-     */ 
-//    @Test
-    public void testGetFutureMeetingIdNonExisting() { }
-    
-    /** 
-     * Check if exception is thrown when meeting id has date in the past.
-     */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testGetFutureMeetingIdWithDateInThePast() { }
-    
-    /** 
-     * Check if the meeting with the requested ID is returned. 
-     */ 
-//    @Test
-    public void testGetMeetingId() { }
-        
-    /** 
-     * Check if the non existing meeting the requested ID returns null.
-     */ 
-//    @Test
-    public void testGetMeetingIdNonExisting() { }
-        
-    /** 
-     * Check if the list of future meetings scheduled with this contact is returned. 
-     */ 
-//    @Test
-    public void testGetFutureMeetingListByContact() { }
-    
-    /** 
-     * Check if an empty list is returned on no future meetings.
-     */ 
-//    @Test
-    public void testGetFutureMeetingListByContactEmptyList() { }
-    
-    /** 
-     * Check if chronologically sorted list is returned.
-     */ 
-//    @Test
-    public void testGetFutureMeetingListByContactSorted() { }
-    
-    /** 
-     * Check if no duplicates are returned.
-     */ 
-//    @Test
-    public void testGetFutureMeetingListByContactNoDups() { }
-    
-    /** 
-     * Check if an exception is thrown when a contact does not exist.
-     */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testGetFutureMeetingListByContactNonExistent() { }
-    
-    /** 
-     * Test if the list of meetings that are scheduled for, or that took 
-     * place on, the specified date is returned.
-     */ 
-//    @Test
-    public void testGetFutureMeetingListByDate() { }
-    
-    /** 
-     * Check that the list returned is chronologically sorted.
-     */ 
-//    @Test
-    public void testGetFutureMeetingListByDateSorted() { }
-    
-    /** 
-     * Check that the list returned does not contain any dups.
-     */ 
-//    @Test
-    public void testGetFutureMeetingListByDateNoDups() { }
-    
-    /** 
-     * Check that the list returned empty if none found.
-     */ 
-//    @Test
-    public void testGetFutureMeetingListByDateNoneFound() { }
-    
-    /** 
-     * Test if the list of past meetings in which this contact has participated is returned. 
-     */
-//    @Test
-    public void testGetPastMeetingList() { }
-    
-    /** 
-     * Test if list is returned empty on none found.
-     */ 
-//    @Test
-    public void testGetPastMeetingListNoneFound() { }
-    
-    /** 
-     * Check if returned list is chronologically sorted.
-     */ 
-//    @Test
-    public void testGetPastMeetingListSorted() { }
-    
-    /** 
-     * Test if returned list does not contain any duplicates. 
-     */ 
-//    @Test
-    public void testGetPastMeetingListNoDups() { }
-    
-    /** 
-     * Check if the exception is thrown when a contact does not exist.
-     */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testGetPastMeetingListContactNotExistent() { }
-    
-    /** 
-     * Check if a new record for a meeting that took place in the past was created. 
-     */ 
-//    @Test
-    public void testAddNewPastMeeting() { }
-    
-    /** 
-     * Check if exception is thrown on an empty list.
-     */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testAddNewPastMeetingEmptyList() { }
-    
-    /** 
-     * Check if exception is thrown on a non existent contact.
-     */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testAddNewPastMeetingContactNonExistent() { }
-    
-    /** 
-     * Check if exception happens if contacts is null. 
-     */ 
-//    @Test(expected=NullPointerException.class)
-    public void testAddNewPastMeetingContactsNull() { }
-    
-    /** 
-     * Check if exception happens if date is null. 
-     */ 
-//    @Test(expected=NullPointerException.class)
-    public void testAddNewPastMeetingDateNull() { }
-    
-    /** 
-     * Check if exception happens if notes is null. 
-     */ 
-//    @Test(expected=NullPointerException.class)
-    public void testAddNewPastMeetingNotesNull() { }
-    
-    /** 
-     * Test if a future meeting was converted to a PastMeeting after adding notes.
-     */ 
-//    @Test
-    public void testAddMeetingNotesFutureToPastMeeting() { }
-    
-    /** 
-     * Test if returned PastMeeting contain added notes.
-     */ 
-//    @Test
-    public void testAddMeetingNotesReturnPastMeetingWithNotes() { }
-    
-    /** 
-     * Check if notes are added to a past meeting. 
-     */ 
-//    @Test
-    public void testAddMeetingNotesPastMeeting() { }
-    
-    /** 
-     * Test exception when meeting does not exist.
-     */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testAddMeetingNotesMeetingNonExisting() { }
-    
-    /** 
-     * Test exception on a meeting set in the future.
-     */ 
-//    @Test(expected=IllegalStateException.class)
-    public void testAddMeetingNotesFutureMeeting() { }
-    
-    /** 
-     * Test exception on null notes.
-     */ 
-//    @Test(expected=NullPointerException.class)
-    public void testAddMeetingNotesNull() { }
-    
+
+
+    // ****************************** CONTACT tests ******************************* //
+
     /** 
      * Test if specified contact was created.
      */ 
@@ -527,7 +300,248 @@ public class TestContactManager {
         // to avoid this call mixed with the getContacts(int... ids).
         contactManager.getContacts(NULL_NAME);
     }
+
+
+    // ****************************** MEETING tests ******************************* //
+
+    /** 
+     * Check if the meeting with the requested ID is returned. 
+     */ 
+//    @Test
+    public void testGetMeetingId() { }
+        
+    /** 
+     * Check if the non existing meeting the requested ID returns null.
+     */ 
+//    @Test
+    public void testGetMeetingIdNonExisting() { }
+
+    /** 
+     * Test if a future meeting was converted to a PastMeeting after adding notes.
+     */ 
+//    @Test
+    public void testAddMeetingNotesFutureToPastMeeting() { }
     
+    /** 
+     * Test if returned PastMeeting contain added notes.
+     */ 
+//    @Test
+    public void testAddMeetingNotesReturnPastMeetingWithNotes() { }
+    
+    /** 
+     * Check if notes are added to a past meeting. 
+     */ 
+//    @Test
+    public void testAddMeetingNotesPastMeeting() { }
+    
+    /** 
+     * Test exception when meeting does not exist.
+     */ 
+//    @Test(expected=IllegalArgumentException.class)
+    public void testAddMeetingNotesMeetingNonExisting() { }
+    
+    /** 
+     * Test exception on a meeting set in the future.
+     */ 
+//    @Test(expected=IllegalStateException.class)
+    public void testAddMeetingNotesFutureMeeting() { }
+    
+    /** 
+     * Test exception on null notes.
+     */ 
+    @Test(expected=NullPointerException.class)
+    public void testAddMeetingNotesNull() { }
+
+
+    // ****************************** PAST MEETING tests ******************************* //
+
+    /**
+     * Check if the PAST meeting with the requested ID is returned.
+     */ 
+//    @Test
+    public void testGetPastMeetingId(){    }
+    
+    /**
+     * Check if the non existing PAST meeting with a requested ID returns null.
+     */ 
+//    @Test
+    public void testGetPastMeetingIdNull(){    }
+    
+    /**
+     * Check exception is thrown if there is a meeting with that ID happening in the future 
+     */ 
+//    @Test(expected=IllegalArgumentException.class)
+    public void testGetPastMeetingIdInTheFuture(){    }
+    
+    /** 
+     * Test if the list of past meetings in which this contact has participated is returned. 
+     */
+//    @Test
+    public void testGetPastMeetingList() { }
+    
+    /** 
+     * Test if list is returned empty on none found.
+     */ 
+//    @Test
+    public void testGetPastMeetingListNoneFound() { }
+    
+    /** 
+     * Check if returned list is chronologically sorted.
+     */ 
+//    @Test
+    public void testGetPastMeetingListSorted() { }
+    
+    /** 
+     * Test if returned list does not contain any duplicates. 
+     */ 
+//    @Test
+    public void testGetPastMeetingListNoDups() { }
+    
+    /** 
+     * Check if the exception is thrown when a contact does not exist.
+     */ 
+//    @Test(expected=IllegalArgumentException.class)
+    public void testGetPastMeetingListContactNotExistent() { }
+    
+    /** 
+     * Check if a new record for a meeting that took place in the past was created. 
+     */ 
+//    @Test
+    public void testAddNewPastMeeting() { }
+    
+    /** 
+     * Check if exception is thrown on an empty list.
+     */ 
+//    @Test(expected=IllegalArgumentException.class)
+    public void testAddNewPastMeetingEmptyList() { }
+    
+    /** 
+     * Check if exception is thrown on a non existent contact.
+     */ 
+//    @Test(expected=IllegalArgumentException.class)
+    public void testAddNewPastMeetingContactNonExistent() { }
+    
+    /** 
+     * Check if exception happens if contacts is null. 
+     */ 
+//    @Test(expected=NullPointerException.class)
+    public void testAddNewPastMeetingContactsNull() { }
+    
+    /** 
+     * Check if exception happens if date is null. 
+     */ 
+//    @Test(expected=NullPointerException.class)
+    public void testAddNewPastMeetingDateNull() { }
+    
+    /** 
+     * Check if exception happens if notes is null. 
+     */ 
+//    @Test(expected=NullPointerException.class)
+    public void testAddNewPastMeetingNotesNull() { }
+
+
+    // ****************************** FUTURE MEETING tests ******************************* //
+
+    /** 
+     * Testing if a new meeting to be held in the future was added. 
+     */ 
+//    @Test
+    public void testAddFutureMeeting() { }
+    
+    /** 
+     * Testing if a new meeting to be held in the future was tried to be added in the past. 
+     */ 
+//    @Test(expected=IllegalArgumentException.class)
+    public void testAddFutureMeetingWithPastDate() { }
+    
+    /** 
+     * Testing if any contact is unknown when adding a future meeting.
+     */ 
+//    @Test(expected=IllegalArgumentException.class)
+    public void testAddFutureMeetingWithUnknownContact() { }
+    
+    /** 
+     * Testing if any contact is non-existent when adding a future meeting.
+     */ 
+//    @Test(expected=IllegalArgumentException.class)
+    public void testAddFutureMeetingWithNonExistentContact() { }
+    
+    /** 
+     * Test if FUTURE meeting is returned with the requested ID
+     */ 
+//    @Test
+    public void testGetFutureMeetingId() { }
+    
+    /** 
+     * Test if null if no future meeting found for given id.
+     */ 
+//    @Test
+    public void testGetFutureMeetingIdNonExisting() { }
+    
+    /** 
+     * Check if exception is thrown when meeting id has date in the past.
+     */ 
+//    @Test(expected=IllegalArgumentException.class)
+    public void testGetFutureMeetingIdWithDateInThePast() { }
+    
+    /** 
+     * Check if the list of future meetings scheduled with this contact is returned. 
+     */ 
+//    @Test
+    public void testGetFutureMeetingListByContact() { }
+    
+    /** 
+     * Check if an empty list is returned on no future meetings.
+     */ 
+//    @Test
+    public void testGetFutureMeetingListByContactEmptyList() { }
+    
+    /** 
+     * Check if chronologically sorted list is returned.
+     */ 
+//    @Test
+    public void testGetFutureMeetingListByContactSorted() { }
+    
+    /** 
+     * Check if no duplicates are returned.
+     */ 
+//    @Test
+    public void testGetFutureMeetingListByContactNoDups() { }
+    
+    /** 
+     * Check if an exception is thrown when a contact does not exist.
+     */ 
+//    @Test(expected=IllegalArgumentException.class)
+    public void testGetFutureMeetingListByContactNonExistent() { }
+    
+    /** 
+     * Test if the list of meetings that are scheduled for, or that took 
+     * place on, the specified date is returned.
+     */ 
+//    @Test
+    public void testGetFutureMeetingListByDate() { }
+    
+    /** 
+     * Check that the list returned is chronologically sorted.
+     */ 
+//    @Test
+    public void testGetFutureMeetingListByDateSorted() { }
+    
+    /** 
+     * Check that the list returned does not contain any dups.
+     */ 
+//    @Test
+    public void testGetFutureMeetingListByDateNoDups() { }
+    
+    /** 
+     * Check that the list returned empty if none found.
+     */ 
+//    @Test
+    public void testGetFutureMeetingListByDateNoneFound() { }
+
+
+    // ****************************** File access tests ******************************* //
+
     /** 
      * Check that expected data is saved to disk.
      */ 
