@@ -30,6 +30,11 @@ public class TestContactManager {
      */
     private final String NULL_NAME = null;
 
+    /**
+     * Null Notes.
+     */
+    private final String NULL_NOTES = null;
+
     
     // *************************** SINGLE SEARCH CONTACT *************************** //
     /**
@@ -398,8 +403,10 @@ public class TestContactManager {
     /** 
      * Test exception on notes null.
      */ 
-//    @Test(expected=NullPointerException.class)
-    public void testAddNewContactNullNotes() { }
+    @Test(expected=NullPointerException.class)
+    public void testAddNewContactNullNotes() {
+    	contactManager.addNewContact(CONTACT_NAME_NEW, NULL_NOTES);
+    }
     
     /** 
      * Check if the contact returned corresponds to the given id.
