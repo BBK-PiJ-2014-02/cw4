@@ -900,10 +900,15 @@ public class TestContactManager {
     }
 
     /** 
-     * Test if null if no future meeting found for given id.
+     * Test null if no future meeting found for given id.
      */ 
-//    @Test
-    public void testGetFutureMeetingIdNonExisting() { }
+    @Test
+    public void testGetFutureMeetingIdNonExisting() {
+        FutureMeeting futureMeetingFound = contactManager.getFutureMeeting(CONTACT_ID_NOT_REAL);
+
+        // The id was not real, expecting a null.
+        assertNull(futureMeetingFound);
+    }
     
     /** 
      * Check if exception is thrown when meeting id has date in the past.
