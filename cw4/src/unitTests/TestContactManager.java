@@ -20,6 +20,7 @@ import contactManager.Contact;
 import contactManager.ContactImpl;
 import contactManager.ContactManager;
 import contactManager.ContactManagerImpl;
+import contactManager.FutureMeeting;
 import contactManager.FutureMeetingImpl;
 import contactManager.Meeting;
 import contactManager.MeetingImpl;
@@ -878,9 +879,26 @@ public class TestContactManager {
     /** 
      * Test if FUTURE meeting is returned with the requested ID
      */ 
-//    @Test
-    public void testGetFutureMeetingId() { }
-    
+    @Test
+    public void testGetFutureMeetingId() {
+        // Get the future meeting
+        FutureMeeting futureMeeting = contactManager.getFutureMeeting(CONTACT_ID_FUTURE);
+
+        // Check that we have a future meeting
+        assertNotNull(futureMeeting);
+
+        // Check that the returned elements match
+        assertEquals(CONTACT_ID_FUTURE,futureMeeting.getId());
+        assertEquals(DATE_FUTURE, futureMeeting.getDate());
+        Set<Contact> contactsSet = futureMeeting.getContacts();
+
+        // Ensure we got a contactsSet
+        assertNotNull(contactsSet);
+
+        // Check that we have this contact in the found list.
+        assertTrue(contactsSet.contains(futureContact));
+    }
+
     /** 
      * Test if null if no future meeting found for given id.
      */ 
