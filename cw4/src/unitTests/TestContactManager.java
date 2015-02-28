@@ -17,6 +17,7 @@ import contactManager.Contact;
 import contactManager.ContactImpl;
 import contactManager.ContactManager;
 import contactManager.ContactManagerImpl;
+import contactManager.FutureMeetingImpl;
 import contactManager.Meeting;
 import contactManager.MeetingImpl;
 import contactManager.PastMeeting;
@@ -108,44 +109,44 @@ public class TestContactManager {
      */
     private Set<Contact> contactList = new HashSet<Contact>();
 
+    
     // ***************************************************************************** //
     // *                                  MEETING                                  * //
     // ***************************************************************************** //
-
-    /**
-     * The default Meeting id.
-     */
-    private final int MEETING_ID = 1;
-
-    /**
-     * The default Meeting notes.
-     */
-    private final String MEETING_NOTES = "Default meeting notes";
-
     /**
      * Non existent Meeting id.
      */
     private final int MEETING_NOT_EXISTING_ID = 123;
 
     /**
+     * The Present Meeting id.
+     */
+    private final int MEETING_ID_PRESENT = 1;
+
+    /**
+     * The Present Meeting notes.
+     */
+    private final String MEETING_NOTES_PRESENT = "Present meeting notes";
+
+    /**
      * Past Meeting id.
      */
-    private final int MEETING_PAST_ID = 2;
+    private final int MEETING_ID_PAST = 2;
     
     /**
      * Past Meeting notes.
      */
-    private final String MEETING_PAST_NOTES = "Past meeting notes";
+    private final String MEETING_NOTES_PAST = "Past meeting notes";
     
     /**
      * Future Meeting id.
      */
-    private final int MEETING_FUTURE_ID = 3;
+    private final int MEETING_ID_FUTURE = 3;
 
     /**
      * Future Meeting notes.
      */
-    private final String MEETING_FUTURE_NOTES = "Future meeting notes";
+    private final String MEETING_NOTES_FUTURE = "Future meeting notes";
 
     /**
      * Meeting Past Date.
@@ -167,9 +168,19 @@ public class TestContactManager {
     // *                           GENERIC OBJECT HANDLERS                         * //
     // ***************************************************************************** //
     /**
-     * The generic Meeting testing object handler.
+     * The Past Meeting testing object handler.
      */
-    private Meeting meeting;
+    private Meeting pastMeeting;
+
+    /**
+     * The Present Meeting testing object handler.
+     */
+    private Meeting presentMeeting;
+
+    /**
+     * The Future Meeting testing object handler.
+     */
+    private Meeting futureMeeting;
     
     /**
      * The ContactManager testing object handler.
@@ -346,8 +357,8 @@ public class TestContactManager {
      */ 
     @Test
     public void testGetMeetingId() { 
-        Meeting meetingFound = contactManager.getMeeting(MEETING_ID);
-        assertEquals(meeting,meetingFound);
+        Meeting meetingFound = contactManager.getMeeting(MEETING_ID_PRESENT);
+        assertEquals(presentMeeting,meetingFound);
     }
         
     /** 
@@ -355,8 +366,8 @@ public class TestContactManager {
      */ 
     @Test
     public void testGetMeetingIdNonExisting() { 
-    	Meeting meetingFound = contactManager.getMeeting(MEETING_NOT_EXISTING_ID);
-    	assertNull(meetingFound);
+        Meeting meetingFound = contactManager.getMeeting(MEETING_NOT_EXISTING_ID);
+        assertNull(meetingFound);
     }
 
     /** 
@@ -364,7 +375,7 @@ public class TestContactManager {
      */ 
     @Test(expected=IllegalArgumentException.class)
     public void testAddMeetingNotesMeetingNonExisting() { 
-    	contactManager.addMeetingNotes(MEETING_NOT_EXISTING_ID, MEETING_NOTES);
+        contactManager.addMeetingNotes(MEETING_NOT_EXISTING_ID, MEETING_NOTES_PRESENT);
     }
     
     /** 
@@ -372,7 +383,7 @@ public class TestContactManager {
      */ 
     @Test(expected=NullPointerException.class)
     public void testAddMeetingNotesNull() { 
-    	contactManager.addMeetingNotes(MEETING_ID, NULL_NOTES);
+        contactManager.addMeetingNotes(MEETING_ID_PRESENT, NULL_NOTES);
     }
 
     /** 
@@ -380,10 +391,10 @@ public class TestContactManager {
      */ 
     @Test
     public void testAddMeetingNotesFutureToPastMeeting() { 
-    	contactManager.addMeetingNotes(MEETING_FUTURE_ID, MEETING_NOTES);
-    	Meeting meetingFound = contactManager.getMeeting(MEETING_FUTURE_ID);
-    	assertNotNull(meetingFound);
-    	assertEquals(PastMeetingImpl.class,meetingFound.getClass());
+        contactManager.addMeetingNotes(MEETING_ID_FUTURE, MEETING_NOTES_PRESENT);
+        Meeting meetingFound = contactManager.getMeeting(MEETING_ID_FUTURE);
+        assertNotNull(meetingFound);
+        assertEquals(PastMeetingImpl.class,meetingFound.getClass());
     }
     
     /** 
@@ -391,10 +402,10 @@ public class TestContactManager {
      */ 
     @Test
     public void testAddMeetingNotesReturnPastMeetingWithNotes() { 
-    	contactManager.addMeetingNotes(MEETING_FUTURE_ID, MEETING_NOTES);
-    	PastMeeting meetingFound = contactManager.getPastMeeting(MEETING_FUTURE_ID);
-    	assertNotNull(meetingFound);
-    	assertEquals(MEETING_NOTES, meetingFound.getNotes());
+        contactManager.addMeetingNotes(MEETING_ID_FUTURE, MEETING_NOTES_PRESENT);
+        PastMeeting meetingFound = contactManager.getPastMeeting(MEETING_ID_FUTURE);
+        assertNotNull(meetingFound);
+        assertEquals(MEETING_NOTES_PRESENT, meetingFound.getNotes());
     }
     
     /** 
@@ -402,10 +413,10 @@ public class TestContactManager {
      */ 
     @Test
     public void testAddMeetingNotesPastMeeting() { 
-    	contactManager.addMeetingNotes(MEETING_PAST_ID, MEETING_NOTES);
-    	PastMeeting pastMeeting = contactManager.getPastMeeting(MEETING_PAST_ID);
-    	assertNotNull(pastMeeting);
-    	assertEquals(MEETING_NOTES, pastMeeting.getNotes());
+        contactManager.addMeetingNotes(MEETING_ID_PAST, MEETING_NOTES_PRESENT);
+        PastMeeting pastMeeting = contactManager.getPastMeeting(MEETING_ID_PAST);
+        assertNotNull(pastMeeting);
+        assertEquals(MEETING_NOTES_PRESENT, pastMeeting.getNotes());
     }
     
     /** 
@@ -413,7 +424,7 @@ public class TestContactManager {
      */ 
     @Test(expected=IllegalStateException.class)
     public void testAddMeetingNotesFutureMeeting() { 
-    	contactManager.addMeetingNotes(MEETING_FUTURE_ID, MEETING_NOTES);
+        contactManager.addMeetingNotes(MEETING_ID_FUTURE, MEETING_NOTES_PRESENT);
     }
     
 
@@ -424,13 +435,13 @@ public class TestContactManager {
      */ 
     @Test
     public void testGetPastMeetingId(){ 
-    	PastMeeting pastMeetingFound = contactManager.getPastMeeting(MEETING_PAST_ID);
+        PastMeeting pastMeetingFound = contactManager.getPastMeeting(MEETING_ID_PAST);
 
-    	// Ensure given meeting is not null.
-    	assertNotNull(pastMeetingFound);
-    	
-    	// This is checking Meeting only
-        assertEquals(MEETING_ID, pastMeetingFound.getId());
+        // Ensure given meeting is not null.
+        assertNotNull(pastMeetingFound);
+        
+        // This is checking Meeting only
+        assertEquals(MEETING_ID_PRESENT, pastMeetingFound.getId());
         // Verify all expected contacts are there.
         verifyDefaultContactList(pastMeetingFound.getContacts());
         // Check the date of the meeting if matches the default expected.
@@ -442,8 +453,8 @@ public class TestContactManager {
      */ 
     @Test
     public void testGetPastMeetingIdNull(){
-    	PastMeeting pastMeeting = contactManager.getPastMeeting(MEETING_NOT_EXISTING_ID);
-    	assertNull(pastMeeting);
+        PastMeeting pastMeeting = contactManager.getPastMeeting(MEETING_NOT_EXISTING_ID);
+        assertNull(pastMeeting);
     }
     
     /**
@@ -451,7 +462,7 @@ public class TestContactManager {
      */ 
     @Test(expected=IllegalArgumentException.class)
     public void testGetPastMeetingIdInTheFuture(){ 
-    	contactManager.getPastMeeting(MEETING_FUTURE_ID);
+        contactManager.getPastMeeting(MEETING_ID_FUTURE);
     }
     
     /** 
@@ -637,16 +648,20 @@ public class TestContactManager {
 
     
     
-    
+    // **************************************************************************** //
+    //                                                                              //
+    //                                 HELPERS                                      //
+    //                                                                              //
+    // **************************************************************************** //
     
     /**
      * Initialize all meetings with the default values.
      */
     private void defaultMeetingInit() {
         try {
-            meeting = new MeetingImpl(MEETING_ID,DATE_PRESENT,contactList);
-            meeting = new MeetingImpl(MEETING_FUTURE_ID,DATE_FUTURE,contactList);
-            meeting = new MeetingImpl(MEETING_PAST_ID,DATE_PAST,contactList);
+            pastMeeting    = new PastMeetingImpl(MEETING_ID_PAST,DATE_PAST,contactList,MEETING_NOTES_PAST);
+            presentMeeting = new MeetingImpl(MEETING_ID_PRESENT,DATE_PRESENT,contactList);
+            futureMeeting  = new FutureMeetingImpl(MEETING_ID_FUTURE,DATE_FUTURE,contactList);
         } catch (Exception e) {
             // Keep calm and carry on.
         }
@@ -724,6 +739,5 @@ public class TestContactManager {
         
         // re-ensure we have got all three correct.
         assertTrue(foundCorrect == 3);
-    	
     }
-} 
+ } 
