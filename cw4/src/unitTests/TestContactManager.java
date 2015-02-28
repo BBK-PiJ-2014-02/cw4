@@ -572,7 +572,7 @@ public class TestContactManager {
     public void testGetPastMeetingIdInTheFuture(){ 
         contactManager.getPastMeeting(MEETING_ID_FUTURE);
     }
-    
+
     /** 
      * Test if the list of past meetings in which this contact has participated is returned. 
      */
@@ -639,8 +639,11 @@ public class TestContactManager {
     /** 
      * Check if the exception is thrown when a contact does not exist.
      */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testGetPastMeetingListContactNotExistent() { }
+    @Test(expected=IllegalArgumentException.class)
+    public void testGetPastMeetingListContactNotExistent() { 
+        contactManager.getPastMeetingList(new ContactImpl(CONTACT_ID_NOT_REAL,
+                CONTACT_NAME_NOT_IN_MEETING, CONTACT_NOTES_NOT_IN_MEETING));
+    }
     
     /** 
      * Check if a new record for a meeting that took place in the past was created. 
