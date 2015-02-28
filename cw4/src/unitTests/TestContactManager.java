@@ -102,12 +102,28 @@ public class TestContactManager {
     private final String CONTACT_NOTES_NEW = "This is a new contact";
 
 
-    // ****************************** NON EXISTENT CONTACT **************************** //
+    // ********************************** BOGUS CONTACT ******************************* //
     /**
      * Fake contact id.
      */
     private final int CONTACT_ID_NOT_REAL = 123;
-    
+
+    /**
+     * Fake contact name.
+     */
+    private final String CONTACT_NAME_NOT_REAL = "Fake Bogus Regis";
+
+    /**
+     * Fake notes.
+     */
+    private final String CONTACT_NOTES_NOT_REAL = "Note: What do you mean by notes not real?";
+
+    /**
+     * The bogus Contact
+     */
+    private Contact bogusContact;
+
+    // ****************************** NON EXISTENT CONTACT **************************** //
     /**
      * Non existing contact id.
      */
@@ -212,6 +228,11 @@ public class TestContactManager {
      * The not used in meetings contact list.
      */
     private Set<Contact> notInMeetingsList = new HashSet<Contact>();
+
+    /**
+     * The bogs meeting list to test on contacts that do not exist.
+     */
+    private Set<Contact> bogusMeetingsList = new HashSet<Contact>();
 
     /**
      * The full contact list available.
@@ -750,8 +771,10 @@ public class TestContactManager {
     /** 
      * Testing if any contact is unknown when adding a future meeting.
      */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testAddFutureMeetingWithUnknownContact() { }
+    @Test(expected=IllegalArgumentException.class)
+    public void testAddFutureMeetingWithUnknownContact() { 
+        contactManager.addFutureMeeting(bogusMeetingsList, DATE_FUTURE);
+    }
     
     /** 
      * Testing if any contact is non-existent when adding a future meeting.
@@ -901,6 +924,7 @@ public class TestContactManager {
         presentContact      = new ContactImpl(CONTACT_ID_PRESENT, CONTACT_NAME_PRESENT, CONTACT_NOTES_PRESENT);
         futureContact       = new ContactImpl(CONTACT_ID_FUTURE, CONTACT_NAME_FUTURE, CONTACT_NOTES_FUTURE);
         notInMeetingContact = new ContactImpl(CONTACT_ID_NOT_IN_MEETING, CONTACT_NAME_NOT_IN_MEETING, CONTACT_NOTES_NOT_IN_MEETING);
+        bogusContact        = new ContactImpl(CONTACT_ID_NOT_REAL, CONTACT_NAME_NOT_REAL, CONTACT_NOTES_NOT_REAL);
 
         // The past contact list.
         pastContactList.add(pastContact);
@@ -910,6 +934,8 @@ public class TestContactManager {
         futureContactList.add(futureContact);
         // The not in meeting contact list.
         notInMeetingsList.add(notInMeetingContact);
+        // The bogus contact list.
+        bogusMeetingsList.add(bogusContact);
     }
 
     /**
