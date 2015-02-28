@@ -17,8 +17,6 @@ import contactManager.Contact;
 import contactManager.ContactImpl;
 import contactManager.ContactManager;
 import contactManager.ContactManagerImpl;
-import contactManager.FutureMeeting;
-import contactManager.FutureMeetingImpl;
 import contactManager.Meeting;
 import contactManager.MeetingImpl;
 import contactManager.PastMeeting;
@@ -428,14 +426,20 @@ public class TestContactManager {
     public void testAddMeetingNotesFutureToPastMeeting() { 
     	contactManager.addMeetingNotes(MEETING_FUTURE_ID, MEETING_NOTES);
     	Meeting meetingFound = contactManager.getMeeting(MEETING_FUTURE_ID);
+    	assertNotNull(meetingFound);
     	assertEquals(PastMeetingImpl.class,meetingFound.getClass());
     }
     
     /** 
      * Test if returned PastMeeting contain added notes.
      */ 
-//    @Test
-    public void testAddMeetingNotesReturnPastMeetingWithNotes() { }
+    @Test
+    public void testAddMeetingNotesReturnPastMeetingWithNotes() { 
+    	contactManager.addMeetingNotes(MEETING_FUTURE_ID, MEETING_NOTES);
+    	PastMeeting meetingFound = (PastMeeting) contactManager.getMeeting(MEETING_FUTURE_ID);
+    	assertNotNull(meetingFound);
+    	assertEquals(MEETING_NOTES, meetingFound.getNotes());
+    }
     
     /** 
      * Check if notes are added to a past meeting. 
