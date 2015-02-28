@@ -854,8 +854,10 @@ public class TestContactManager {
     /** 
      * Testing if a new meeting to be held in the future was tried to be added in the past. 
      */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testAddFutureMeetingWithPastDate() { }
+    @Test(expected=IllegalArgumentException.class)
+    public void testAddFutureMeetingWithPastDate() {
+        contactManager.addFutureMeeting(contactList, DATE_PAST);
+    }
     
     /** 
      * Testing if any contact is unknown when adding a future meeting.
