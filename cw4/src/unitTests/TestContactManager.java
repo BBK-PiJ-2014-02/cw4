@@ -388,6 +388,14 @@ public class TestContactManager {
     }
     
     /** 
+     * Test exception on null notes.
+     */ 
+    @Test(expected=NullPointerException.class)
+    public void testAddMeetingNotesNull() { 
+    	contactManager.addMeetingNotes(MEETING_ID, NULL_NOTES);
+    }
+
+    /** 
      * Test if a future meeting was converted to a PastMeeting after adding notes.
      */ 
 //    @Test
@@ -411,12 +419,6 @@ public class TestContactManager {
 //    @Test(expected=IllegalStateException.class)
     public void testAddMeetingNotesFutureMeeting() { }
     
-    /** 
-     * Test exception on null notes.
-     */ 
-//    @Test(expected=NullPointerException.class)
-    public void testAddMeetingNotesNull() { }
-
 
     // ****************************** PAST MEETING tests ******************************* //
 
