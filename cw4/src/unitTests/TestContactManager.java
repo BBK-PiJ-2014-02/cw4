@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,6 +16,8 @@ import contactManager.Contact;
 import contactManager.ContactImpl;
 import contactManager.ContactManager;
 import contactManager.ContactManagerImpl;
+import contactManager.Meeting;
+import contactManager.MeetingImpl;
 
 /**
  * Testing the ContactManager class.
@@ -24,6 +28,9 @@ import contactManager.ContactManagerImpl;
  *
  */
 public class TestContactManager {
+    // ***************************************************************************** //
+    // *                                  CONTACTS                                 * //
+    // ***************************************************************************** //
     /**
      * Null Contact name.
      */
@@ -33,7 +40,6 @@ public class TestContactManager {
      * Null Notes.
      */
     private final String NULL_NOTES = null;
-
     
     // *************************** SINGLE SEARCH CONTACT *************************** //
     /**
@@ -50,7 +56,6 @@ public class TestContactManager {
      * Single contact notes.
      */
     private final String CONTACT_NOTES_SINGLE = "Notes for the single contact";
-
     
     // ************************** MULTIPLE SEARCH CONTACT ************************** //
     /**
@@ -73,7 +78,6 @@ public class TestContactManager {
      * for contacts using the contact name for multiple search results.
      */
     private Set<Contact> multipleContactList = new HashSet<Contact>();
-    
     
     // ********************************* NEW CONTACT ******************************* //
     /**
@@ -101,6 +105,38 @@ public class TestContactManager {
      */
     private Set<Contact> contactList = new HashSet<Contact>();
 
+    // ***************************************************************************** //
+    // *                                  MEETING                                  * //
+    // ***************************************************************************** //
+
+    /**
+     * The default Meeting id
+     */
+    private final int MEETING_ID = 1;
+    
+    /**
+     * Meeting Past Date.
+     */
+    private Calendar DATE_PAST;
+    
+    /**
+     * Meeting Future Date.
+     */
+    private Calendar DATE_FUTURE;
+    
+    /**
+     * Meeting Present Date.
+     */
+    private Calendar DATE_PRESENT;
+    
+    
+    // ***************************************************************************** //
+    // *                           GENERIC OBJECT HANDLERS                         * //
+    // ***************************************************************************** //
+    /**
+     * The generic Meeting testing object handler.
+     */
+    private Meeting meeting;
     
     /**
      * The ContactManager testing object handler.
@@ -114,18 +150,21 @@ public class TestContactManager {
      */
     @Before
     public void before() {
-        // Adding all contacts existing to the contactList to be acted upon.
-        contactList.add(new ContactImpl(CONTACT_ID_SINGLE_SEARCH_RESULT, 
-                CONTACT_NAME_SINGLE_SEARCH_RESULT, CONTACT_NOTES_SINGLE));
-        contactList.add(new ContactImpl(CONTACT_ID_SINGLE_SEARCH_RESULT, 
-                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, CONTACT_NOTES_MULTIPLE));
-
-        // The multiple list search result expected.
-        multipleContactList.add(new ContactImpl(CONTACT_ID_MULTIPLE_SEARCH_RESULT, 
-                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, CONTACT_NOTES_NEW));
-        multipleContactList.add(new ContactImpl(CONTACT_ID_NEW, CONTACT_NAME_NEW, 
-                CONTACT_NOTES_NEW));
-
+        // Contact initialisations.
+        defaultContactInit();
+        
+        // Calendar date initialisations.
+        defaultCalendarInit();
+            
+        // Meeting initialisations.
+//        defaultMeetingInit();
+        
+        try {
+            meeting = new MeetingImpl(MEETING_ID,DATE_PRESENT,contactList);
+        } catch (Exception e) {
+            // Do nothing and carry on.
+        }
+        
         // Initialising contactManager.
         contactManager = new ContactManagerImpl();
     }
@@ -177,7 +216,7 @@ public class TestContactManager {
      */ 
     @Test(expected=NullPointerException.class)
     public void testAddNewContactNullName() { 
-    	contactManager.addNewContact(NULL_NAME, CONTACT_NOTES_NEW);
+        contactManager.addNewContact(NULL_NAME, CONTACT_NOTES_NEW);
     }
     
     /** 
@@ -185,7 +224,7 @@ public class TestContactManager {
      */ 
     @Test(expected=NullPointerException.class)
     public void testAddNewContactNullNotes() {
-    	contactManager.addNewContact(CONTACT_NAME_NEW, NULL_NOTES);
+        contactManager.addNewContact(CONTACT_NAME_NEW, NULL_NOTES);
     }
     
     /** 
@@ -314,8 +353,11 @@ public class TestContactManager {
     /** 
      * Check if the meeting with the requested ID is returned. 
      */ 
-//    @Test
-    public void testGetMeetingId() { }
+    @Test
+    public void testGetMeetingId() { 
+        Meeting meetingFound = contactManager.getMeeting(MEETING_ID);
+        assertEquals(meeting,meetingFound);
+    }
         
     /** 
      * Check if the non existing meeting the requested ID returns null.
@@ -356,7 +398,7 @@ public class TestContactManager {
     /** 
      * Test exception on null notes.
      */ 
-    @Test(expected=NullPointerException.class)
+//    @Test(expected=NullPointerException.class)
     public void testAddMeetingNotesNull() { }
 
 
@@ -561,4 +603,41 @@ public class TestContactManager {
 //    @Test
     public void testFlushAtClose() { }
 
+    
+    
+    /**
+     * Initialize all meetings with the default values.
+     */
+    private void defaultMeetingInit() {
+        
+    }
+    
+    /**
+     * Initialize all Calendar dates with the default values.
+     */
+    private void defaultCalendarInit() {
+        DATE_FUTURE = new GregorianCalendar();
+        DATE_FUTURE.set(Calendar.YEAR+1, Calendar.MONTH, Calendar.DATE, Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND);
+        DATE_PAST = new GregorianCalendar();
+        DATE_PAST.set(Calendar.YEAR-1, Calendar.MONTH, Calendar.DATE, Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND);
+        DATE_PRESENT = new GregorianCalendar();
+        DATE_PRESENT.set(Calendar.YEAR, Calendar.MONTH, Calendar.DATE, Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND);
+    }
+    
+    /**
+     * Initialize all contacts with the default values.
+     */
+    private void defaultContactInit() {
+        // Adding all contacts existing to the contactList to be acted upon.
+        contactList.add(new ContactImpl(CONTACT_ID_SINGLE_SEARCH_RESULT, 
+                CONTACT_NAME_SINGLE_SEARCH_RESULT, CONTACT_NOTES_SINGLE));
+        contactList.add(new ContactImpl(CONTACT_ID_SINGLE_SEARCH_RESULT, 
+                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, CONTACT_NOTES_MULTIPLE));
+
+        // The multiple list search result expected.
+        multipleContactList.add(new ContactImpl(CONTACT_ID_MULTIPLE_SEARCH_RESULT, 
+                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, CONTACT_NOTES_NEW));
+        multipleContactList.add(new ContactImpl(CONTACT_ID_NEW, CONTACT_NAME_NEW, 
+                CONTACT_NOTES_NEW));
+    }
 }
