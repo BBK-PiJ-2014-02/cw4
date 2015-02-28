@@ -18,6 +18,7 @@ import contactManager.Contact;
 import contactManager.ContactImpl;
 import contactManager.ContactManager;
 import contactManager.ContactManagerImpl;
+import contactManager.FutureMeeting;
 import contactManager.FutureMeetingImpl;
 import contactManager.Meeting;
 import contactManager.MeetingImpl;
@@ -708,8 +709,37 @@ public class TestContactManager {
     /** 
      * Testing if a new meeting to be held in the future was added. 
      */ 
-//    @Test
-    public void testAddFutureMeeting() { }
+    @Test
+    public void testAddFutureMeeting() { 
+        // A new future meeting with contacts not in any meeting lists.
+        contactManager.addFutureMeeting(notInMeetingsList, DATE_FUTURE);
+        
+        // Get the future meetings on the future date supplied.
+        List<Meeting> futureMeetingList = contactManager.getFutureMeetingList(DATE_FUTURE);
+        
+        // Check we have got something
+        assertNotNull(futureMeetingList);
+        
+        // Need to iterate through all future meetings and contacts to check if the 
+        // contacts we have just added on the future meeting, were added.
+        // Please note that this test is expecting for the notInMeetingList to contain
+        // a set of contacts that have not yet been used elsewhere, thus, unique.
+        boolean wasCreated = false;
+        for(Meeting meeting: futureMeetingList) {
+            Set<Contact> contacts = meeting.getContacts();
+            if ( contacts != null ) {
+                Contact contactFound = contacts.iterator().next();
+                if ( contactFound.equals(notInMeetingContact)) {
+                    wasCreated = true;
+                    continue;
+                }
+            }
+        }
+        
+        // Ensure the meeting was created
+        assertTrue(wasCreated);
+        
+    }
     
     /** 
      * Testing if a new meeting to be held in the future was tried to be added in the past. 
