@@ -18,7 +18,6 @@ import contactManager.Contact;
 import contactManager.ContactImpl;
 import contactManager.ContactManager;
 import contactManager.ContactManagerImpl;
-import contactManager.FutureMeeting;
 import contactManager.FutureMeetingImpl;
 import contactManager.Meeting;
 import contactManager.MeetingImpl;
@@ -797,8 +796,10 @@ public class TestContactManager {
     /** 
      * Check if exception is thrown when meeting id has date in the past.
      */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testGetFutureMeetingIdWithDateInThePast() { }
+    @Test(expected=IllegalArgumentException.class)
+    public void testGetFutureMeetingIdWithDateInThePast() { 
+    	contactManager.getFutureMeeting(MEETING_ID_PAST);
+    }
     
     /** 
      * Check if the list of future meetings scheduled with this contact is returned. 
