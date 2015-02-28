@@ -2,6 +2,7 @@ package unitTests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
@@ -113,7 +114,12 @@ public class TestContactManager {
      * The default Meeting id
      */
     private final int MEETING_ID = 1;
-    
+
+    /**
+     * Non existent Meeting id
+     */
+    private final int MEETING_NOT_EXISTING_ID = 123;
+
     /**
      * Meeting Past Date.
      */
@@ -362,8 +368,11 @@ public class TestContactManager {
     /** 
      * Check if the non existing meeting the requested ID returns null.
      */ 
-//    @Test
-    public void testGetMeetingIdNonExisting() { }
+    @Test
+    public void testGetMeetingIdNonExisting() { 
+    	Meeting meetingFound = contactManager.getMeeting(MEETING_NOT_EXISTING_ID);
+    	assertNull(meetingFound);
+    }
 
     /** 
      * Test if a future meeting was converted to a PastMeeting after adding notes.
