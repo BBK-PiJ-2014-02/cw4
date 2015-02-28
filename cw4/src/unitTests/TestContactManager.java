@@ -390,8 +390,10 @@ public class TestContactManager {
     /** 
      * Test exception on name null.
      */ 
-//    @Test(expected=NullPointerException.class)
-    public void testAddNewContactNullName() { }
+    @Test(expected=NullPointerException.class)
+    public void testAddNewContactNullName() { 
+    	contactManager.addNewContact(NULL_NAME, CONTACT_NOTES_NEW);
+    }
     
     /** 
      * Test exception on notes null.
@@ -467,7 +469,6 @@ public class TestContactManager {
         // re-ensure we have got all three correct.
         assertTrue(foundCorrect == 3);
     }
-    
     
     /** 
      * Check if exception is thrown on an id that does not correspond to a real contact. 
