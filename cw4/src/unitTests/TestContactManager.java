@@ -450,14 +450,15 @@ public class TestContactManager {
     	PastMeeting pastMeeting = contactManager.getPastMeeting(MEETING_PAST_ID);
     	assertNotNull(pastMeeting);
     	assertEquals(MEETING_NOTES, pastMeeting.getNotes());
-    	
     }
     
     /** 
      * Test exception on a meeting set in the future.
      */ 
-//    @Test(expected=IllegalStateException.class)
-    public void testAddMeetingNotesFutureMeeting() { }
+    @Test(expected=IllegalStateException.class)
+    public void testAddMeetingNotesFutureMeeting() { 
+    	contactManager.addMeetingNotes(MEETING_FUTURE_ID, MEETING_NOTES);
+    }
     
 
     // ****************************** PAST MEETING tests ******************************* //
