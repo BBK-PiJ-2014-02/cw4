@@ -681,8 +681,10 @@ public class TestContactManager {
     /** 
      * Check if exception happens if contacts is null. 
      */ 
-//    @Test(expected=NullPointerException.class)
-    public void testAddNewPastMeetingContactsNull() { }
+    @Test(expected=NullPointerException.class)
+    public void testAddNewPastMeetingContactsNull() { 
+        contactManager.addNewPastMeeting(null, DATE_PAST, MEETING_NOTES_PAST);
+    }
     
     /** 
      * Check if exception happens if date is null. 
