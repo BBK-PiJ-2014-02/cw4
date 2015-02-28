@@ -654,8 +654,14 @@ public class TestContactManager {
     /** 
      * Check if exception is thrown on an empty list.
      */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testAddNewPastMeetingEmptyList() { }
+    @Test(expected=IllegalArgumentException.class)
+    public void testAddNewPastMeetingEmptyList() { 
+    	// Create an empty list
+    	Set<Contact> emptyList = new HashSet<Contact>();
+    	
+    	// Expect exception.
+    	contactManager.addNewPastMeeting(emptyList, DATE_PAST, CONTACT_NOTES_PAST);
+    }
     
     /** 
      * Check if exception is thrown on a non existent contact.
