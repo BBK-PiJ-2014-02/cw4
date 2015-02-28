@@ -1,6 +1,7 @@
 package unitTests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -8,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -688,9 +690,37 @@ public class TestContactManager {
     /** 
      * Test if returned list does not contain any duplicates. 
      */ 
-//    @Test
-    public void testGetPastMeetingListNoDups() { }
-    
+    @Test
+    public void testGetPastMeetingListNoDups() {
+        // Get the list.
+        List<PastMeeting> pastMeetingFound = contactManager.getPastMeetingList(pastContact);
+
+        // Ensure we have one
+        assertNotNull(pastMeetingFound);
+
+        // Ensure it is not empty and more than one element is found.
+        // This forces to revisit the test if only one element is produced.
+        assertTrue(pastMeetingFound.size() > 1);
+
+        // Start with the right foot
+        Boolean hasDuplicates = false;
+
+        // Keep a list of all seen elements
+        List<PastMeeting> pastMeetingSeen = new LinkedList<PastMeeting>();
+
+        // Traverse all found elements
+        for( PastMeeting pastMeeting : pastMeetingFound ) {
+            if ( pastMeetingSeen.contains(pastMeeting) ) {
+                hasDuplicates = true;
+                continue;
+            }
+            pastMeetingSeen.add(pastMeeting);
+        }
+
+        // Final moment of truth
+        assertFalse(hasDuplicates);
+    }
+
     /** 
      * Check if the exception is thrown when a contact does not exist.
      */ 
