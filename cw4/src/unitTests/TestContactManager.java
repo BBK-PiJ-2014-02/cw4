@@ -440,8 +440,11 @@ public class TestContactManager {
     /**
      * Check if the non existing PAST meeting with a requested ID returns null.
      */ 
-//    @Test
-    public void testGetPastMeetingIdNull(){    }
+    @Test
+    public void testGetPastMeetingIdNull(){
+    	PastMeeting pastMeeting = contactManager.getPastMeeting(MEETING_NOT_EXISTING_ID);
+    	assertNull(pastMeeting);
+    }
     
     /**
      * Check exception is thrown if there is a meeting with that ID happening in the future 
