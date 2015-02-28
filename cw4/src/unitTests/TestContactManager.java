@@ -870,8 +870,10 @@ public class TestContactManager {
     /** 
      * Testing if any contact is non-existent when adding a future meeting.
      */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testAddFutureMeetingWithNonExistentContact() { }
+    @Test(expected=IllegalArgumentException.class)
+    public void testAddFutureMeetingWithNonExistentContact() {
+        contactManager.addFutureMeeting(bogusMeetingsList, DATE_FUTURE);
+    }
     
     /** 
      * Test if FUTURE meeting is returned with the requested ID
