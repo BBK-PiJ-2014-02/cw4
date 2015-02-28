@@ -656,18 +656,27 @@ public class TestContactManager {
      */ 
     @Test(expected=IllegalArgumentException.class)
     public void testAddNewPastMeetingEmptyList() { 
-    	// Create an empty list
-    	Set<Contact> emptyList = new HashSet<Contact>();
-    	
-    	// Expect exception.
-    	contactManager.addNewPastMeeting(emptyList, DATE_PAST, CONTACT_NOTES_PAST);
+        // Create an empty list
+        Set<Contact> emptyList = new HashSet<Contact>();
+        
+        // Expect exception.
+        contactManager.addNewPastMeeting(emptyList, DATE_PAST, MEETING_NOTES_PAST);
     }
     
     /** 
      * Check if exception is thrown on a non existent contact.
      */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testAddNewPastMeetingContactNonExistent() { }
+    @Test(expected=IllegalArgumentException.class)
+    public void testAddNewPastMeetingContactNonExistent() {
+        // Create a new contact set list.
+        Set<Contact> nonExistingContact = new HashSet<Contact>();
+        
+        // Add a new contact that does not exist in the contact list
+        nonExistingContact.add(new ContactImpl(CONTACT_ID_NOT_REAL, CONTACT_NAME_NOT_IN_MEETING, CONTACT_NOTES_NOT_IN_MEETING));
+        
+        // Expect an exception.
+        contactManager.addNewPastMeeting(notInMeetingsList, DATE_PAST, MEETING_NOTES_PAST);
+    }
     
     /** 
      * Check if exception happens if contacts is null. 
