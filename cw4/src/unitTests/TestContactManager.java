@@ -284,43 +284,7 @@ public class TestContactManager {
         Set<Contact> contactListFound = contactManager.getContacts(CONTACT_ID_NEW,
                 CONTACT_ID_SINGLE_SEARCH_RESULT,CONTACT_ID_MULTIPLE_SEARCH_RESULT);
 
-        // Ensure we have got something returned
-        assertNotNull(contactListFound);
-        
-        // Check if we have three contacts only as expected
-        assertTrue(contactListFound.size() == 3);
-
-        // Expected three records to be correctly matched.
-        int foundCorrect = 0;
-        
-        // Check details as per the contact id returned of each one of them
-        for(int i = 0; i < contactListFound.size(); i++ ) {
-            Contact contactFound = contactListFound.iterator().next();
-            if ( contactFound.getId() == CONTACT_ID_MULTIPLE_SEARCH_RESULT ) {
-                assertTrue(contactFound.getId() == CONTACT_ID_MULTIPLE_SEARCH_RESULT);
-                assertEquals(contactFound.getName(),CONTACT_NAME_MULTIPLE_SEARCH_RESULT);
-                assertEquals(contactFound.getNotes(),CONTACT_NOTES_MULTIPLE);
-                foundCorrect++;
-            }
-            else if ( contactFound.getId() == CONTACT_ID_NEW ) {
-                assertTrue(contactFound.getId() == CONTACT_ID_NEW);
-                assertEquals(contactFound.getName(),CONTACT_NAME_NEW);
-                assertEquals(contactFound.getNotes(),CONTACT_NOTES_NEW);
-                foundCorrect++;
-            }
-            else if ( contactFound.getId() == CONTACT_ID_SINGLE_SEARCH_RESULT ){
-                assertTrue(contactFound.getId() == CONTACT_ID_SINGLE_SEARCH_RESULT);
-                assertEquals(contactFound.getName(),CONTACT_NAME_SINGLE_SEARCH_RESULT);
-                assertEquals(contactFound.getNotes(),CONTACT_NOTES_SINGLE);
-                foundCorrect++;
-            }
-            else {
-                foundCorrect--;
-            }
-        }
-        
-        // re-ensure we have got all three correct.
-        assertTrue(foundCorrect == 3);
+        verifyDefaultContactList(contactListFound);
     }
     
     /** 
@@ -458,8 +422,20 @@ public class TestContactManager {
     /**
      * Check if the PAST meeting with the requested ID is returned.
      */ 
-//    @Test
-    public void testGetPastMeetingId(){    }
+    @Test
+    public void testGetPastMeetingId(){ 
+    	PastMeeting pastMeetingFound = contactManager.getPastMeeting(MEETING_PAST_ID);
+
+    	// Ensure given meeting is not null.
+    	assertNotNull(pastMeetingFound);
+    	
+    	// This is checking Meeting only
+        assertEquals(MEETING_ID, pastMeetingFound.getId());
+        // Verify all expected contacts are there.
+        verifyDefaultContactList(pastMeetingFound.getContacts());
+        // Check the date of the meeting if matches the default expected.
+        assertEquals(DATE_PRESENT, pastMeetingFound.getDate());
+    }
     
     /**
      * Check if the non existing PAST meeting with a requested ID returns null.
@@ -656,6 +632,8 @@ public class TestContactManager {
 
     
     
+    
+    
     /**
      * Initialize all meetings with the default values.
      */
@@ -697,4 +675,50 @@ public class TestContactManager {
         multipleContactList.add(new ContactImpl(CONTACT_ID_NEW, CONTACT_NAME_NEW, 
                 CONTACT_NOTES_NEW));
     }
-}
+
+    /**
+     * Given a set list of contacts, check if all the default ones are inside only once.
+     * 
+     * @param contactListFound the Set of Contacts found.
+     */
+    private void verifyDefaultContactList(Set<Contact> contactListFound) {
+        // Ensure we have got something returned
+        assertNotNull(contactListFound);
+        
+        // Check if we have three contacts only as expected
+        assertTrue(contactListFound.size() == 3);
+
+        // Expected three records to be correctly matched.
+        int foundCorrect = 0;
+        
+        // Check details as per the contact id returned of each one of them
+        for(int i = 0; i < contactListFound.size(); i++ ) {
+            Contact contactFound = contactListFound.iterator().next();
+            if ( contactFound.getId() == CONTACT_ID_MULTIPLE_SEARCH_RESULT ) {
+                assertTrue(contactFound.getId() == CONTACT_ID_MULTIPLE_SEARCH_RESULT);
+                assertEquals(contactFound.getName(),CONTACT_NAME_MULTIPLE_SEARCH_RESULT);
+                assertEquals(contactFound.getNotes(),CONTACT_NOTES_MULTIPLE);
+                foundCorrect++;
+            }
+            else if ( contactFound.getId() == CONTACT_ID_NEW ) {
+                assertTrue(contactFound.getId() == CONTACT_ID_NEW);
+                assertEquals(contactFound.getName(),CONTACT_NAME_NEW);
+                assertEquals(contactFound.getNotes(),CONTACT_NOTES_NEW);
+                foundCorrect++;
+            }
+            else if ( contactFound.getId() == CONTACT_ID_SINGLE_SEARCH_RESULT ){
+                assertTrue(contactFound.getId() == CONTACT_ID_SINGLE_SEARCH_RESULT);
+                assertEquals(contactFound.getName(),CONTACT_NAME_SINGLE_SEARCH_RESULT);
+                assertEquals(contactFound.getNotes(),CONTACT_NOTES_SINGLE);
+                foundCorrect++;
+            }
+            else {
+                foundCorrect--;
+            }
+        }
+        
+        // re-ensure we have got all three correct.
+        assertTrue(foundCorrect == 3);
+    	
+    }
+} 
