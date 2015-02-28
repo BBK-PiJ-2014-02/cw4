@@ -449,8 +449,10 @@ public class TestContactManager {
     /**
      * Check exception is thrown if there is a meeting with that ID happening in the future 
      */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testGetPastMeetingIdInTheFuture(){    }
+    @Test(expected=IllegalArgumentException.class)
+    public void testGetPastMeetingIdInTheFuture(){ 
+    	contactManager.getPastMeeting(MEETING_FUTURE_ID);
+    }
     
     /** 
      * Test if the list of past meetings in which this contact has participated is returned. 
