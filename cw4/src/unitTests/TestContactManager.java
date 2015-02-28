@@ -190,15 +190,7 @@ public class TestContactManager {
         defaultCalendarInit();
             
         // Meeting initialisations.
-//        defaultMeetingInit();
-        
-        try {
-            meeting = new MeetingImpl(MEETING_ID,DATE_PRESENT,contactList);
-            meeting = new MeetingImpl(MEETING_FUTURE_ID,DATE_FUTURE,contactList);
-            meeting = new MeetingImpl(MEETING_PAST_ID,DATE_PAST,contactList);
-        } catch (Exception e) {
-            // Keep calm and carry on.
-        }
+        defaultMeetingInit();
         
         // Initialising contactManager.
         contactManager = new ContactManagerImpl();
@@ -668,7 +660,13 @@ public class TestContactManager {
      * Initialize all meetings with the default values.
      */
     private void defaultMeetingInit() {
-        
+        try {
+            meeting = new MeetingImpl(MEETING_ID,DATE_PRESENT,contactList);
+            meeting = new MeetingImpl(MEETING_FUTURE_ID,DATE_FUTURE,contactList);
+            meeting = new MeetingImpl(MEETING_PAST_ID,DATE_PAST,contactList);
+        } catch (Exception e) {
+            // Keep calm and carry on.
+        }
     }
     
     /**
