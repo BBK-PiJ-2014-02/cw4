@@ -17,8 +17,12 @@ import contactManager.Contact;
 import contactManager.ContactImpl;
 import contactManager.ContactManager;
 import contactManager.ContactManagerImpl;
+import contactManager.FutureMeeting;
+import contactManager.FutureMeetingImpl;
 import contactManager.Meeting;
 import contactManager.MeetingImpl;
+import contactManager.PastMeeting;
+import contactManager.PastMeetingImpl;
 
 /**
  * Testing the ContactManager class.
@@ -111,19 +115,39 @@ public class TestContactManager {
     // ***************************************************************************** //
 
     /**
-     * The default Meeting id
+     * The default Meeting id.
      */
     private final int MEETING_ID = 1;
 
     /**
-     * The default Meeting notes
+     * The default Meeting notes.
      */
     private final String MEETING_NOTES = "Default meeting notes";
 
     /**
-     * Non existent Meeting id
+     * Non existent Meeting id.
      */
     private final int MEETING_NOT_EXISTING_ID = 123;
+
+    /**
+     * Past Meeting id.
+     */
+    private final int MEETING_PAST_ID = 2;
+    
+    /**
+     * Past Meeting notes.
+     */
+    private final String MEETING_PAST_NOTES = "Past meeting notes";
+    
+    /**
+     * Future Meeting id.
+     */
+    private final int MEETING_FUTURE_ID = 3;
+
+    /**
+     * Future Meeting notes.
+     */
+    private final String MEETING_FUTURE_NOTES = "Future meeting notes";
 
     /**
      * Meeting Past Date.
@@ -172,8 +196,10 @@ public class TestContactManager {
         
         try {
             meeting = new MeetingImpl(MEETING_ID,DATE_PRESENT,contactList);
+            meeting = new MeetingImpl(MEETING_FUTURE_ID,DATE_FUTURE,contactList);
+            meeting = new MeetingImpl(MEETING_PAST_ID,DATE_PAST,contactList);
         } catch (Exception e) {
-            // Do nothing and carry on.
+            // Keep calm and carry on.
         }
         
         // Initialising contactManager.
@@ -398,8 +424,12 @@ public class TestContactManager {
     /** 
      * Test if a future meeting was converted to a PastMeeting after adding notes.
      */ 
-//    @Test
-    public void testAddMeetingNotesFutureToPastMeeting() { }
+    @Test
+    public void testAddMeetingNotesFutureToPastMeeting() { 
+    	contactManager.addMeetingNotes(MEETING_FUTURE_ID, MEETING_NOTES);
+    	Meeting meetingFound = contactManager.getMeeting(MEETING_FUTURE_ID);
+    	assertEquals(PastMeetingImpl.class,meetingFound.getClass());
+    }
     
     /** 
      * Test if returned PastMeeting contain added notes.
