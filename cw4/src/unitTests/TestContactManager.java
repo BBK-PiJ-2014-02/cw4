@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
@@ -103,6 +104,86 @@ public class TestContactManager {
      * New contact notes.
      */
     private final String CONTACT_NOTES_NEW = "This is a new contact";
+
+
+    // ********************************* PAST CONTACT ******************************* //
+    /**
+     * Past contact id.
+     */
+    private final int CONTACT_ID_PAST = 12345;
+    
+    /**
+     * Past contact name.
+     */
+    private final String CONTACT_NAME_PAST = "John Past Smith";
+    
+    /**
+     * Past contact notes.
+     */
+    private final String CONTACT_NOTES_PAST = "This is a past contact";
+
+    /**
+     * The past contact.
+     */
+    private Contact pastContact;
+
+    // ****************************** PRESENT CONTACT ****************************** //
+    /**
+     * Present contact id.
+     */
+    private final int CONTACT_ID_PRESENT = 123456;
+    
+    /**
+     * Present contact name.
+     */
+    private final String CONTACT_NAME_PRESENT = "John Present Smith";
+    
+    /**
+     * Present contact notes.
+     */
+    private final String CONTACT_NOTES_PRESENT = "This is a present contact";
+
+    /**
+     * The present contact.
+     */
+    private Contact presentContact;
+
+    // ******************************* FUTURE CONTACT ******************************* //
+    /**
+     * Future contact id.
+     */
+    private final int CONTACT_ID_FUTURE = 1234567;
+    
+    /**
+     * Future contact name.
+     */
+    private final String CONTACT_NAME_FUTURE = "John Future Smith";
+    
+    /**
+     * Future contact notes.
+     */
+    private final String CONTACT_NOTES_FUTURE = "This is a future contact";
+
+    /**
+     * The future contact.
+     */
+    private Contact futureContact;
+
+    // ******************************* ALL CONTACTS LIST ***************************** //
+    /**
+     * The past contact list.
+     */
+    private Set<Contact> pastContactList = new HashSet<Contact>();
+
+    /**
+     * The present contact list.
+     */
+    private Set<Contact> presentContactList = new HashSet<Contact>();
+
+    /**
+     * The future contact list.
+     */
+    private Set<Contact> futureContactList = new HashSet<Contact>();
 
     /**
      * The full contact list available.
@@ -468,8 +549,34 @@ public class TestContactManager {
     /** 
      * Test if the list of past meetings in which this contact has participated is returned. 
      */
-//    @Test
-    public void testGetPastMeetingList() { }
+    @Test
+    public void testGetPastMeetingList() {
+        // Get the PastMeeting List with one result only, where this past Contact has been present.
+        List<PastMeeting> pastMeetingList = contactManager.getPastMeetingList(pastContact);
+
+        // Only expecting one result
+        assertTrue(pastMeetingList.size() == 1);
+        
+        // Get the one result PastMeeting
+        PastMeeting pastMeeting = pastMeetingList.get(0);
+        
+        // Check the contacts of this meeting
+        Set<Contact> pastContactSetFound = pastMeeting.getContacts();
+        
+        // Expect a not null contact list
+        assertNotNull(pastContactSetFound);
+
+        // Check if only one contact is found.
+        assertTrue(pastContactSetFound.size() == 1);
+        
+        // Get the respective contact
+        Contact pastContactFound = pastContactSetFound.iterator().next();
+        
+        // Assert that the contact found is the one we expect.
+        assertEquals(pastContact.getId(), pastContactFound.getId());
+        assertEquals(pastContact.getName(), pastContactFound.getName());
+        assertEquals(pastContact.getNotes(), pastContactFound.getNotes());
+    }
     
     /** 
      * Test if list is returned empty on none found.
@@ -659,9 +766,9 @@ public class TestContactManager {
      */
     private void defaultMeetingInit() {
         try {
-            pastMeeting    = new PastMeetingImpl(MEETING_ID_PAST,DATE_PAST,contactList,MEETING_NOTES_PAST);
-            presentMeeting = new MeetingImpl(MEETING_ID_PRESENT,DATE_PRESENT,contactList);
-            futureMeeting  = new FutureMeetingImpl(MEETING_ID_FUTURE,DATE_FUTURE,contactList);
+            pastMeeting    = new PastMeetingImpl(MEETING_ID_PAST,DATE_PAST,pastContactList,MEETING_NOTES_PAST);
+            presentMeeting = new MeetingImpl(MEETING_ID_PRESENT,DATE_PRESENT,presentContactList);
+            futureMeeting  = new FutureMeetingImpl(MEETING_ID_FUTURE,DATE_FUTURE,futureContactList);
         } catch (Exception e) {
             // Keep calm and carry on.
         }
@@ -680,7 +787,7 @@ public class TestContactManager {
     }
     
     /**
-     * Initialize all contacts with the default values.
+     * Initialize all contacts and contact lists with the default values.
      */
     private void defaultContactInit() {
         // Adding all contacts existing to the contactList to be acted upon.
@@ -694,6 +801,18 @@ public class TestContactManager {
                 CONTACT_NAME_MULTIPLE_SEARCH_RESULT, CONTACT_NOTES_NEW));
         multipleContactList.add(new ContactImpl(CONTACT_ID_NEW, CONTACT_NAME_NEW, 
                 CONTACT_NOTES_NEW));
+
+        // Initialise past, present and future contact.
+        pastContact    = new ContactImpl(CONTACT_ID_PAST, CONTACT_NAME_PAST, CONTACT_NOTES_PAST);
+        presentContact = new ContactImpl(CONTACT_ID_PRESENT, CONTACT_NAME_PRESENT, CONTACT_NOTES_PRESENT);
+        futureContact  = new ContactImpl(CONTACT_ID_FUTURE, CONTACT_NAME_FUTURE, CONTACT_NOTES_FUTURE);
+
+        // The past contact list.
+        pastContactList.add(pastContact);
+        // The present contact list.
+        presentContactList.add(presentContact);
+        // The future contact list.
+        futureContactList.add(futureContact);
     }
 
     /**
