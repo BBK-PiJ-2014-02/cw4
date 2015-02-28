@@ -88,7 +88,7 @@ public class TestContactManager {
     /**
      * New contact id.
      */
-    private final int CONTACT_ID_NEW = 1234;
+    private final int CONTACT_ID_NEW = 3;
     
     /**
      * New contact to be added, not in the list.
@@ -105,7 +105,7 @@ public class TestContactManager {
     /**
      * Fake contact id.
      */
-    private final int CONTACT_ID_NOT_REAL = 123;
+    private final int CONTACT_ID_NOT_REAL = 4;
 
     /**
      * Fake contact name.
@@ -126,7 +126,7 @@ public class TestContactManager {
     /**
      * Non existing contact id.
      */
-    private final int CONTACT_ID_NOT_IN_MEETING = 2123;
+    private final int CONTACT_ID_NOT_IN_MEETING = 5;
     
     /**
      * Non existing contact name.
@@ -148,7 +148,7 @@ public class TestContactManager {
     /**
      * Past contact id.
      */
-    private final int CONTACT_ID_PAST = 12345;
+    private final int CONTACT_ID_PAST = 6;
     
     /**
      * Past contact name.
@@ -169,7 +169,7 @@ public class TestContactManager {
     /**
      * Present contact id.
      */
-    private final int CONTACT_ID_PRESENT = 123456;
+    private final int CONTACT_ID_PRESENT = 7;
     
     /**
      * Present contact name.
@@ -190,7 +190,7 @@ public class TestContactManager {
     /**
      * Future contact id.
      */
-    private final int CONTACT_ID_FUTURE = 1234567;
+    private final int CONTACT_ID_FUTURE = 8;
     
     /**
      * Future contact name.
@@ -245,12 +245,12 @@ public class TestContactManager {
     /**
      * Non existent Meeting id.
      */
-    private final int MEETING_NOT_EXISTING_ID = 123;
+    private final int MEETING_NOT_EXISTING_ID = 1;
 
     /**
      * The Present Meeting id.
      */
-    private final int MEETING_ID_PRESENT = 1;
+    private final int MEETING_ID_PRESENT = 2;
 
     /**
      * The Present Meeting notes.
@@ -260,7 +260,7 @@ public class TestContactManager {
     /**
      * Past Meeting id.
      */
-    private final int MEETING_ID_PAST = 2;
+    private final int MEETING_ID_PAST = 3;
     
     /**
      * Past Meeting notes.
@@ -270,7 +270,7 @@ public class TestContactManager {
     /**
      * Future Meeting id.
      */
-    private final int MEETING_ID_FUTURE = 3;
+    private final int MEETING_ID_FUTURE = 4;
 
     /**
      * Future Meeting notes.
@@ -648,8 +648,42 @@ public class TestContactManager {
     /** 
      * Check if returned list is chronologically sorted.
      */ 
-//    @Test
-    public void testGetPastMeetingListSorted() { }
+    @Test
+    public void testGetPastMeetingListSorted() { 
+        // Get a list of past meetings.
+        List<PastMeeting> pastMeetingList = contactManager.getPastMeetingList(pastContact);
+
+        // Check that we do not have a null list.
+        assertNotNull(pastMeetingList);
+
+        // Check that we have more than one element.
+        assertTrue(pastMeetingList.size() > 1);
+
+        // Keep a record of previous checked date
+        Calendar previousDate = null;
+
+        // Keep a flag on all sorted until told otherwise..
+        Boolean sorted = true;
+
+        // Check that these come all sorted
+        for(PastMeeting pastMeeting : pastMeetingList) {
+            if ( previousDate == null ) {
+                previousDate = pastMeeting.getDate();
+            }
+            else {
+                if ( previousDate.before(pastMeeting.getDate()) ) {
+                    previousDate = pastMeeting.getDate();
+                }
+                else {
+                    sorted = false;
+                    continue;
+                }
+            }
+        }
+
+        // Final check: sorted?
+        assertTrue(sorted);
+    }
     
     /** 
      * Test if returned list does not contain any duplicates. 
@@ -798,7 +832,7 @@ public class TestContactManager {
      */ 
     @Test(expected=IllegalArgumentException.class)
     public void testGetFutureMeetingIdWithDateInThePast() { 
-    	contactManager.getFutureMeeting(MEETING_ID_PAST);
+        contactManager.getFutureMeeting(MEETING_ID_PAST);
     }
     
     /** 
@@ -880,7 +914,7 @@ public class TestContactManager {
     // **************************************************************************** //
     
     /**
-     * Initialize all meetings with the default values.
+     * Initialise all meetings with the default values.
      */
     private void defaultMeetingInit() {
         try {
@@ -893,7 +927,7 @@ public class TestContactManager {
     }
     
     /**
-     * Initialize all Calendar dates with the default values.
+     * Initialise all Calendar dates with the default values.
      */
     private void defaultCalendarInit() {
         DATE_FUTURE = new GregorianCalendar();
@@ -905,7 +939,7 @@ public class TestContactManager {
     }
     
     /**
-     * Initialize all contacts and contact lists with the default values.
+     * Initialise all contacts and contact lists with the default values.
      */
     private void defaultContactInit() {
         // Adding all contacts existing to the contactList to be acted upon.
