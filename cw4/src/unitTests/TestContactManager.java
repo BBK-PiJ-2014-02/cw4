@@ -86,11 +86,6 @@ public class TestContactManager {
     
     // ********************************* NEW CONTACT ******************************* //
     /**
-     * Not real contact id.
-     */
-    private final int CONTACT_ID_NOT_REAL = 123;
-    
-    /**
      * New contact id.
      */
     private final int CONTACT_ID_NEW = 1234;
@@ -104,6 +99,33 @@ public class TestContactManager {
      * New contact notes.
      */
     private final String CONTACT_NOTES_NEW = "This is a new contact";
+
+
+    // ****************************** NON EXISTENT CONTACT **************************** //
+    /**
+     * Fake contact id.
+     */
+    private final int CONTACT_ID_NOT_REAL = 123;
+    
+    /**
+     * Non existing contact id.
+     */
+    private final int CONTACT_ID_NOT_IN_MEETING = 2123;
+    
+    /**
+     * Non existing contact name.
+     */
+    private final String CONTACT_NAME_NOT_IN_MEETING = "John Not Real Smith";
+    
+    /**
+     * Non existing contact notes.
+     */
+    private final String CONTACT_NOTES_NOT_IN_MEETING = "This is a new contact";
+
+    /**
+     * The not existing in meeting contact.
+     */
+    private Contact notInMeetingContact;
 
 
     // ********************************* PAST CONTACT ******************************* //
@@ -184,6 +206,11 @@ public class TestContactManager {
      * The future contact list.
      */
     private Set<Contact> futureContactList = new HashSet<Contact>();
+
+    /**
+     * The not used in meetings contact list.
+     */
+    private Set<Contact> notInMeetingsList = new HashSet<Contact>();
 
     /**
      * The full contact list available.
@@ -507,7 +534,7 @@ public class TestContactManager {
     public void testAddMeetingNotesFutureMeeting() { 
         contactManager.addMeetingNotes(MEETING_ID_FUTURE, MEETING_NOTES_PRESENT);
     }
-    
+
 
     // ****************************** PAST MEETING tests ******************************* //
 
@@ -554,6 +581,9 @@ public class TestContactManager {
         // Get the PastMeeting List with one result only, where this past Contact has been present.
         List<PastMeeting> pastMeetingList = contactManager.getPastMeetingList(pastContact);
 
+        // Check first that the pastMeetingList is not null before any further operations.
+        assertNotNull(pastMeetingList);
+        
         // Only expecting one result
         assertTrue(pastMeetingList.size() == 1);
         
@@ -581,8 +611,18 @@ public class TestContactManager {
     /** 
      * Test if list is returned empty on none found.
      */ 
-//    @Test
-    public void testGetPastMeetingListNoneFound() { }
+    @Test
+    public void testGetPastMeetingListNoneFound() { 
+        List<PastMeeting> emptyList = contactManager.getPastMeetingList(notInMeetingContact);
+
+        // Check if the emptyList is not null before any other operations.
+        // Null here means that not even an empty list was initialised which
+        // defeats the interface purpose on defining an empty list being returned.
+        assertNotNull(emptyList);
+        
+        // Ensure that the size is zero.
+        assertTrue(emptyList.size() == 0);
+    }
     
     /** 
      * Check if returned list is chronologically sorted.
@@ -803,9 +843,10 @@ public class TestContactManager {
                 CONTACT_NOTES_NEW));
 
         // Initialise past, present and future contact.
-        pastContact    = new ContactImpl(CONTACT_ID_PAST, CONTACT_NAME_PAST, CONTACT_NOTES_PAST);
-        presentContact = new ContactImpl(CONTACT_ID_PRESENT, CONTACT_NAME_PRESENT, CONTACT_NOTES_PRESENT);
-        futureContact  = new ContactImpl(CONTACT_ID_FUTURE, CONTACT_NAME_FUTURE, CONTACT_NOTES_FUTURE);
+        pastContact         = new ContactImpl(CONTACT_ID_PAST, CONTACT_NAME_PAST, CONTACT_NOTES_PAST);
+        presentContact      = new ContactImpl(CONTACT_ID_PRESENT, CONTACT_NAME_PRESENT, CONTACT_NOTES_PRESENT);
+        futureContact       = new ContactImpl(CONTACT_ID_FUTURE, CONTACT_NAME_FUTURE, CONTACT_NOTES_FUTURE);
+        notInMeetingContact = new ContactImpl(CONTACT_ID_NOT_IN_MEETING, CONTACT_NAME_NOT_IN_MEETING, CONTACT_NOTES_NOT_IN_MEETING);
 
         // The past contact list.
         pastContactList.add(pastContact);
@@ -813,6 +854,8 @@ public class TestContactManager {
         presentContactList.add(presentContact);
         // The future contact list.
         futureContactList.add(futureContact);
+        // The not in meeting contact list.
+        notInMeetingsList.add(notInMeetingContact);
     }
 
     /**
