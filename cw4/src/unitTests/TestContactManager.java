@@ -691,14 +691,16 @@ public class TestContactManager {
      */ 
     @Test(expected=NullPointerException.class)
     public void testAddNewPastMeetingDateNull() { 
-    	contactManager.addNewPastMeeting(pastContactList, null, MEETING_NOTES_PAST);
+        contactManager.addNewPastMeeting(pastContactList, null, MEETING_NOTES_PAST);
     }
     
     /** 
      * Check if exception happens if notes is null. 
      */ 
-//    @Test(expected=NullPointerException.class)
-    public void testAddNewPastMeetingNotesNull() { }
+    @Test(expected=NullPointerException.class)
+    public void testAddNewPastMeetingNotesNull() { 
+        contactManager.addNewPastMeeting(pastContactList, DATE_PAST, NULL_NOTES);
+    }
 
 
     // ****************************** FUTURE MEETING tests ******************************* //
