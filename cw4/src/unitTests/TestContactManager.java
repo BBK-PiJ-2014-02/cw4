@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.junit.Before;
@@ -41,6 +42,11 @@ public class TestContactManager {
      */
     private final String CONTACT_NAME_SINGLE_SEARCH_RESULT = "Zchweski Ywmeylt";
     
+    /**
+     * Single contact notes.
+     */
+    private final String CONTACT_NOTES_SINGLE = "Notes for the single contact";
+
     
     // ************************** MULTIPLE SEARCH CONTACT ************************** //
     /**
@@ -53,6 +59,11 @@ public class TestContactManager {
      */
     private final int CONTACT_ID_MULTIPLE_SEARCH_RESULT = 2;
     
+    /**
+     * Multiple contact notes.
+     */
+    private final String CONTACT_NOTES_MULTIPLE = "Notes for the multiple contact";
+
     /**
      * The multiple contact list expected to be returned when searching
      * for contacts using the contact name for multiple search results.
@@ -100,9 +111,9 @@ public class TestContactManager {
     public void before() {
         // Adding all contacts existing to the contactList to be acted upon.
         contactList.add(new ContactImpl(CONTACT_ID_SINGLE_SEARCH_RESULT, 
-                CONTACT_NAME_SINGLE_SEARCH_RESULT, null));
+                CONTACT_NAME_SINGLE_SEARCH_RESULT, CONTACT_NOTES_SINGLE));
         contactList.add(new ContactImpl(CONTACT_ID_SINGLE_SEARCH_RESULT, 
-                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, null));
+                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, CONTACT_NOTES_MULTIPLE));
 
         // The multiple list search result expected.
         multipleContactList.add(new ContactImpl(CONTACT_ID_MULTIPLE_SEARCH_RESULT, 
@@ -389,10 +400,74 @@ public class TestContactManager {
     public void testAddNewContactNullNotes() { }
     
     /** 
-     * Check if the list returned corresponds to the given ids.
+     * Check if the contact returned corresponds to the given id.
      */ 
-//    @Test
-    public void testGetContactsById() { }
+    @Test
+    public void testGetContactsById() { 
+        // Search for the one contact id.
+        Set<Contact> contactListFound = contactManager.getContacts(CONTACT_ID_NEW);
+        
+        // Ensure null was not returned
+        assertNotNull(contactListFound);
+        
+        // Check if we have got one result only as expected
+        assertTrue(contactListFound.size() == 1);
+        
+        // Retrieve the contact info to check if it matches to the result we expect
+        Contact contactFound = contactListFound.iterator().next();
+        assertTrue(contactFound.getId() == CONTACT_ID_NEW);
+        assertEquals(contactFound.getName(),CONTACT_NAME_NEW);
+        assertEquals(contactFound.getNotes(),CONTACT_NOTES_NEW);
+    }
+
+    /** 
+     * Check if the list of contacts returned corresponds to the given ids.
+     */ 
+    @Test
+    public void testGetContactsByIds() { 
+        // Get the list of contacts for the three ids to check
+        Set<Contact> contactListFound = contactManager.getContacts(CONTACT_ID_NEW,
+                CONTACT_ID_SINGLE_SEARCH_RESULT,CONTACT_ID_MULTIPLE_SEARCH_RESULT);
+
+        // Ensure we have got something returned
+        assertNotNull(contactListFound);
+        
+        // Check if we have three contacts only as expected
+        assertTrue(contactListFound.size() == 3);
+
+        // Expected three records to be correctly matched.
+        int foundCorrect = 0;
+        
+        // Check details as per the contact id returned of each one of them
+        for(int i = 0; i < contactListFound.size(); i++ ) {
+            Contact contactFound = contactListFound.iterator().next();
+            if ( contactFound.getId() == CONTACT_ID_MULTIPLE_SEARCH_RESULT ) {
+                assertTrue(contactFound.getId() == CONTACT_ID_MULTIPLE_SEARCH_RESULT);
+                assertEquals(contactFound.getName(),CONTACT_NAME_MULTIPLE_SEARCH_RESULT);
+                assertEquals(contactFound.getNotes(),CONTACT_NOTES_MULTIPLE);
+                foundCorrect++;
+            }
+            else if ( contactFound.getId() == CONTACT_ID_NEW ) {
+                assertTrue(contactFound.getId() == CONTACT_ID_NEW);
+                assertEquals(contactFound.getName(),CONTACT_NAME_NEW);
+                assertEquals(contactFound.getNotes(),CONTACT_NOTES_NEW);
+                foundCorrect++;
+            }
+            else if ( contactFound.getId() == CONTACT_ID_SINGLE_SEARCH_RESULT ){
+                assertTrue(contactFound.getId() == CONTACT_ID_SINGLE_SEARCH_RESULT);
+                assertEquals(contactFound.getName(),CONTACT_NAME_SINGLE_SEARCH_RESULT);
+                assertEquals(contactFound.getNotes(),CONTACT_NOTES_SINGLE);
+                foundCorrect++;
+            }
+            else {
+                foundCorrect--;
+            }
+        }
+        
+        // re-ensure we have got all three correct.
+        assertTrue(foundCorrect == 3);
+    }
+    
     
     /** 
      * Check if exception is thrown on an id that does not correspond to a real contact. 
