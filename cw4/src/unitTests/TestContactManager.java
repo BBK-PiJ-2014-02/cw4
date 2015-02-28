@@ -733,9 +733,35 @@ public class TestContactManager {
     /** 
      * Check if a new record for a meeting that took place in the past was created. 
      */ 
-//    @Test
-    public void testAddNewPastMeeting() { }
-    
+    @Test
+    public void testAddNewPastMeeting() {
+        // Add new Past Meeting
+        contactManager.addNewPastMeeting(notInMeetingsList, DATE_PAST, CONTACT_NOTES_PAST);
+
+        // Retrieve meeting
+        List<PastMeeting> pastMeetingListFound = contactManager.getPastMeetingList(notInMeetingContact);
+
+        // Check if exists
+        assertNotNull(pastMeetingListFound);
+
+        // Check if at least one record
+        assertTrue(pastMeetingListFound.size() > 0);
+
+        // Expect the worst
+        Boolean foundMeeting = false;
+
+        // Scan through the meetings in search for that past date and contact notes.
+        for( PastMeeting pastMeeting : pastMeetingListFound) {
+            if ( pastMeeting.equals(notInMeetingContact) ) {
+                foundMeeting = true;
+            }
+        }
+
+        // The final moment of truth
+        assertTrue(foundMeeting);
+
+    }
+
     /** 
      * Check if exception is thrown on an empty list.
      */ 
