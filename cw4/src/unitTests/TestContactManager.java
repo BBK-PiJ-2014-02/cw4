@@ -436,7 +436,7 @@ public class TestContactManager {
     @Test
     public void testAddMeetingNotesReturnPastMeetingWithNotes() { 
     	contactManager.addMeetingNotes(MEETING_FUTURE_ID, MEETING_NOTES);
-    	PastMeeting meetingFound = (PastMeeting) contactManager.getMeeting(MEETING_FUTURE_ID);
+    	PastMeeting meetingFound = contactManager.getPastMeeting(MEETING_FUTURE_ID);
     	assertNotNull(meetingFound);
     	assertEquals(MEETING_NOTES, meetingFound.getNotes());
     }
@@ -444,8 +444,14 @@ public class TestContactManager {
     /** 
      * Check if notes are added to a past meeting. 
      */ 
-//    @Test
-    public void testAddMeetingNotesPastMeeting() { }
+    @Test
+    public void testAddMeetingNotesPastMeeting() { 
+    	contactManager.addMeetingNotes(MEETING_PAST_ID, MEETING_NOTES);
+    	PastMeeting pastMeeting = contactManager.getPastMeeting(MEETING_PAST_ID);
+    	assertNotNull(pastMeeting);
+    	assertEquals(MEETING_NOTES, pastMeeting.getNotes());
+    	
+    }
     
     /** 
      * Test exception on a meeting set in the future.
