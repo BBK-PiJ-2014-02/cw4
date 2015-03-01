@@ -1111,8 +1111,35 @@ public class TestContactManager {
     /** 
      * Check that the list returned does not contain any dups.
      */ 
-//    @Test
-    public void testGetFutureMeetingListByDateNoDups() { }
+    @Test
+    public void testGetFutureMeetingListByDateNoDups() {
+        List<Meeting> futureMeetingListFound = contactManager.getFutureMeetingList(DATE_FUTURE);
+
+        // check it is not null
+        assertNotNull(futureMeetingListFound);
+
+        // check we have more than one record
+        assertTrue(futureMeetingListFound.size() > 1);
+
+        // Meetings already seen
+        List<Meeting> seenMeetings = new LinkedList<Meeting>();
+
+        // Assume no dups, until told otherwise
+        Boolean hasDups = false;
+
+        for(Meeting meeting : futureMeetingListFound) {
+            if ( seenMeetings.contains(meeting) ) {
+                hasDups = true;
+                continue;
+            }
+            else {
+                seenMeetings.add(meeting);
+            }
+        }
+
+        // Final test
+        assertFalse(hasDups);
+    }
 
     /** 
      * Check that the list returned empty if none found.
