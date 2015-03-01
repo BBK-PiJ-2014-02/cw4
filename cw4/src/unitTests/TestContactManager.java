@@ -999,12 +999,39 @@ public class TestContactManager {
         // Check if the returned list is still sorted.
         assertTrue(sorted);
     }
-    
+
     /** 
      * Check if no duplicates are returned.
      */ 
-//    @Test
-    public void testGetFutureMeetingListByContactNoDups() { }
+    @Test
+    public void testGetFutureMeetingListByContactNoDups() { 
+        List<Meeting> futureMeetingListFound = contactManager.getFutureMeetingList(futureContact);
+
+        // check it is not null
+        assertNotNull(futureMeetingListFound);
+
+        // check we have more than one record
+        assertTrue(futureMeetingListFound.size() > 1);
+
+        // Meetings already seen
+        List<Meeting> seenMeetings = new LinkedList<Meeting>();
+
+        // Assume no dups, until told otherwise
+        Boolean hasDups = false;
+
+        for(Meeting meeting : futureMeetingListFound) {
+            if ( seenMeetings.contains(meeting) ) {
+                hasDups = true;
+                continue;
+            }
+            else {
+                seenMeetings.add(meeting);
+            }
+        }
+
+        // Final test
+        assertFalse(hasDups);
+    }
     
     /** 
      * Check if an exception is thrown when a contact does not exist.
