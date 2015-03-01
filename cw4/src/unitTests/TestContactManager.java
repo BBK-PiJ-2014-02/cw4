@@ -1036,8 +1036,10 @@ public class TestContactManager {
     /** 
      * Check if an exception is thrown when a contact does not exist.
      */ 
-//    @Test(expected=IllegalArgumentException.class)
-    public void testGetFutureMeetingListByContactNonExistent() { }
+    @Test(expected=IllegalArgumentException.class)
+    public void testGetFutureMeetingListByContactNonExistent() { 
+    	contactManager.getFutureMeetingList(bogusContact);
+    }
     
     /** 
      * Test if the list of meetings that are scheduled for, or that took 
