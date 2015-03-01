@@ -921,9 +921,35 @@ public class TestContactManager {
     /** 
      * Check if the list of future meetings scheduled with this contact is returned. 
      */ 
-//    @Test
-    public void testGetFutureMeetingListByContact() { }
-    
+    @Test
+    public void testGetFutureMeetingListByContact() {
+        // Request list of a known to be FutureMeeting.
+        List<Meeting> futureMeetingsFound = contactManager.getFutureMeetingList(futureContact);
+
+        // Check that we have got something
+        assertNotNull(futureMeetingsFound);
+
+        // Check we have got at least one
+        assertTrue(futureMeetingsFound.size() > 0);
+
+        // Make sure we have got ast least one future meeting and no other.
+        Boolean gotFutureMeeting = false;
+        Boolean gotOtherMeetings = false;
+
+        // Check that we have the expected future meeting
+        for( Meeting meetingFound : futureMeetingsFound ) {
+            if ( meetingFound.equals(futureMeeting) ) {
+                gotFutureMeeting = true;
+            } else {
+                gotOtherMeetings = true;
+            }
+        }
+
+        // Final test
+        assertTrue(gotFutureMeeting);
+        assertFalse(gotOtherMeetings);
+    }
+
     /** 
      * Check if an empty list is returned on no future meetings.
      */ 
