@@ -953,8 +953,16 @@ public class TestContactManager {
     /** 
      * Check if an empty list is returned on no future meetings.
      */ 
-//    @Test
-    public void testGetFutureMeetingListByContactEmptyList() { }
+    @Test
+    public void testGetFutureMeetingListByContactEmptyList() { 
+        List<Meeting> foundNoFutureMeetingsList = contactManager.getFutureMeetingList(pastContact);
+
+        // Empty list is not a null response.
+        assertNotNull(foundNoFutureMeetingsList);
+
+        // Check it is emtpy
+        assertTrue(foundNoFutureMeetingsList.size() == 0);
+    }
     
     /** 
      * Check if chronologically sorted list is returned.
