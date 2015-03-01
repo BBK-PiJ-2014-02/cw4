@@ -1178,6 +1178,7 @@ public class TestContactManager {
 
         ContactManager cm = new ContactManagerImpl(TEST_DATA_FILE);
         PastMeeting meetingFound = cm.getPastMeeting(MEETING_ID_PAST);
+        assertNotNull(meetingFound);
 
         assertEquals(newNotes,meetingFound.getNotes());
     }
@@ -1196,6 +1197,7 @@ public class TestContactManager {
 
         ContactManager cm = new ContactManagerImpl(TEST_DATA_FILE);
         PastMeeting meetingFound = cm.getPastMeeting(MEETING_ID_PAST);
+        assertNotNull(meetingFound);
 
         assertEquals(newNotes,meetingFound.getNotes());
     }
