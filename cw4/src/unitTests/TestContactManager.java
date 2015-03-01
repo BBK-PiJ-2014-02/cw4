@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -36,6 +37,11 @@ import contactManager.PastMeetingImpl;
  *
  */
 public class TestContactManager {
+    /**
+     * Test data file.
+     */
+    private final String TEST_DATA_FILE = "src"+File.separatorChar+"unitTests"+File.separatorChar+"test_data.txt";
+
     // ***************************************************************************** //
     // *                                  CONTACTS                                 * //
     // ***************************************************************************** //
@@ -336,7 +342,7 @@ public class TestContactManager {
         defaultMeetingInit();
         
         // Initialising contactManager.
-        contactManager = new ContactManagerImpl();
+        contactManager = new ContactManagerImpl(TEST_DATA_FILE);
     }
 
 
@@ -1105,7 +1111,7 @@ public class TestContactManager {
 
         // Check if the returned list is still sorted.
         assertTrue(sorted);
-    	
+        
     }
 
     /** 
@@ -1162,14 +1168,37 @@ public class TestContactManager {
     /** 
      * Check that expected data is saved to disk.
      */ 
-//    @Test
-    public void testFlush() { }
+    @Test
+    public void testFlush() {
+        // Add new notes to an existing meeting, flush, 
+        // create a new contactManager instance, and check for the new notes.
+        String newNotes = "Completely new notes";
+        contactManager.addMeetingNotes(MEETING_ID_PAST, newNotes);
+        contactManager.flush();
+
+        ContactManager cm = new ContactManagerImpl(TEST_DATA_FILE);
+        PastMeeting meetingFound = cm.getPastMeeting(MEETING_ID_PAST);
+
+        assertEquals(newNotes,meetingFound.getNotes());
+    }
 
     /** 
      * Check if when application is closed, expected data is saved in file.
      */ 
-//    @Test
-    public void testFlushAtClose() { }
+    @Test
+    public void testFlushAtClose() { 
+        // Add new notes to an existing meeting, close, 
+        // create a new contactManager instance, and check for the new notes.
+        String newNotes = "Completely new notes 2";
+        contactManager.addMeetingNotes(MEETING_ID_PAST, newNotes);
+
+        // TODO: Check how to close contactManager here without doing a direct flush.
+
+        ContactManager cm = new ContactManagerImpl(TEST_DATA_FILE);
+        PastMeeting meetingFound = cm.getPastMeeting(MEETING_ID_PAST);
+
+        assertEquals(newNotes,meetingFound.getNotes());
+    }
 
     
     
