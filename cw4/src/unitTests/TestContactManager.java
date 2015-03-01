@@ -960,15 +960,45 @@ public class TestContactManager {
         // Empty list is not a null response.
         assertNotNull(foundNoFutureMeetingsList);
 
-        // Check it is emtpy
+        // Check it is empty
         assertTrue(foundNoFutureMeetingsList.size() == 0);
     }
     
     /** 
      * Check if chronologically sorted list is returned.
      */ 
-//    @Test
-    public void testGetFutureMeetingListByContactSorted() { }
+    @Test
+    public void testGetFutureMeetingListByContactSorted() { 
+        List<Meeting> futureMeetingsList = contactManager.getFutureMeetingList(futureContact);
+
+        // Check if not null
+        assertNotNull(futureMeetingsList);
+
+        // check at least two records
+        assertTrue(futureMeetingsList.size() > 1);
+
+        // Save previous meeting for comparison
+        Meeting previousMeeting = null;
+
+        // Sorted flag true by default. 
+        Boolean sorted = true;
+
+        // Ensure they all come chronologically sorted
+        for( Meeting meeting : futureMeetingsList ) {
+            if ( previousMeeting == null ) {
+                previousMeeting = meeting;
+            }
+            else {
+                if ( previousMeeting.getDate().after(meeting.getDate()) ) {
+                    sorted = false;
+                    continue;
+                }
+            }
+        }
+
+        // Check if the returned list is still sorted.
+        assertTrue(sorted);
+    }
     
     /** 
      * Check if no duplicates are returned.
