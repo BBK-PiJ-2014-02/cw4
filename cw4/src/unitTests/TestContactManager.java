@@ -1074,8 +1074,39 @@ public class TestContactManager {
     /** 
      * Check that the list returned is chronologically sorted.
      */ 
-//    @Test
-    public void testGetFutureMeetingListByDateSorted() { }
+    @Test
+    public void testGetFutureMeetingListByDateSorted() { 
+        List<Meeting> futureMeetingsList = contactManager.getFutureMeetingList(DATE_FUTURE);
+
+        // Check if not null
+        assertNotNull(futureMeetingsList);
+
+        // check at least two records
+        assertTrue(futureMeetingsList.size() > 1);
+
+        // Save previous meeting for comparison
+        Meeting previousMeeting = null;
+
+        // Sorted flag true by default. 
+        Boolean sorted = true;
+
+        // Ensure they all come chronologically sorted
+        for( Meeting meeting : futureMeetingsList ) {
+            if ( previousMeeting == null ) {
+                previousMeeting = meeting;
+            }
+            else {
+                if ( previousMeeting.getDate().after(meeting.getDate()) ) {
+                    sorted = false;
+                    continue;
+                }
+            }
+        }
+
+        // Check if the returned list is still sorted.
+        assertTrue(sorted);
+    	
+    }
 
     /** 
      * Check that the list returned does not contain any dups.
