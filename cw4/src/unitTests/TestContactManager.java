@@ -1038,28 +1038,51 @@ public class TestContactManager {
      */ 
     @Test(expected=IllegalArgumentException.class)
     public void testGetFutureMeetingListByContactNonExistent() { 
-    	contactManager.getFutureMeetingList(bogusContact);
+       contactManager.getFutureMeetingList(bogusContact);
     }
-    
+
     /** 
      * Test if the list of meetings that are scheduled for, or that took 
      * place on, the specified date is returned.
      */ 
-//    @Test
-    public void testGetFutureMeetingListByDate() { }
-    
+    @Test
+    public void testGetFutureMeetingListByDate() { 
+       List<Meeting> foundMeetingsList = contactManager.getFutureMeetingList(DATE_FUTURE);
+
+       // Check not null
+       assertNotNull(foundMeetingsList);
+
+       // Check we have one record at least
+       assertTrue(foundMeetingsList.size() > 0);
+
+       // One failed date to fail the test.
+       Boolean allInDate = true;
+
+       // Check they are all on the given data
+       for( Meeting meeting : foundMeetingsList ) {
+          if (! meeting.getDate().equals(DATE_FUTURE) )  {
+             allInDate = false;
+             continue;
+          }
+       }
+
+       // Final check
+       assertTrue(allInDate);
+
+    }
+
     /** 
      * Check that the list returned is chronologically sorted.
      */ 
 //    @Test
     public void testGetFutureMeetingListByDateSorted() { }
-    
+
     /** 
      * Check that the list returned does not contain any dups.
      */ 
 //    @Test
     public void testGetFutureMeetingListByDateNoDups() { }
-    
+
     /** 
      * Check that the list returned empty if none found.
      */ 
