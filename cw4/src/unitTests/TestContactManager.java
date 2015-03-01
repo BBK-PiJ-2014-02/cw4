@@ -1144,8 +1144,17 @@ public class TestContactManager {
     /** 
      * Check that the list returned empty if none found.
      */ 
-//    @Test
-    public void testGetFutureMeetingListByDateNoneFound() { }
+    @Test
+    public void testGetFutureMeetingListByDateNoneFound() {
+        List<Meeting> foundNoFutureMeetingsList = contactManager.getFutureMeetingList(DATE_FUTURE);
+
+        // Empty list is not a null response.
+        assertNotNull(foundNoFutureMeetingsList);
+
+        // Check it is empty
+        assertTrue(foundNoFutureMeetingsList.size() == 0);
+
+    }
 
 
     // ****************************** File access tests ******************************* //
