@@ -1397,7 +1397,7 @@ public class TestContactManager {
             fileWriter = new FileWriter(copyFile);
 
             while((line = in.readLine()) != null ) {
-               fileWriter.write(line);
+               fileWriter.write(line+"\n");
             }
             fileWriter.flush();
             fileWriter.close();
