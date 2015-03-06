@@ -6,7 +6,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -14,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,9 +44,19 @@ import contactManager.PastMeetingImpl;
  */
 public class TestContactManager {
     /**
-     * Test data file.
+     * Path to the test files.
      */
-    private final String TEST_DATA_FILE = "src"+File.separatorChar+"unitTests"+File.separatorChar+"test_data.txt";
+    private final String TEST_FILE_PATH = "src"+File.separatorChar+"unitTests"+File.separatorChar;
+
+    /**
+     * The original test data file.
+     */
+    private final String ORIGINAL_TEST_DATA_FILE = TEST_FILE_PATH + "original_test_data.txt";
+
+    /**
+     * The temporary copy of the original test data file for processing.
+     */
+    private final String TEST_DATA_FILE = TEST_FILE_PATH + "test_data.txt";
 
     // ***************************************************************************** //
     // *                                  CONTACTS                                 * //
@@ -332,6 +348,9 @@ public class TestContactManager {
      */
     @Before
     public void before() {
+        // Create a copy of the original test file into the test file to be used
+        copyOriginalTestToTestFile();
+
         // Contact initialisations.
         defaultContactInit();
         
@@ -343,6 +362,25 @@ public class TestContactManager {
         
         // Initialising contactManager.
         contactManager = new ContactManagerImpl(TEST_DATA_FILE);
+    }
+
+
+    // ********************************** AFTER ********************************* //
+    /**
+     * After each test, do the cleanup before starting with the next.
+     */
+    @After
+    public void after() {
+        // Delete the test data file to ensure next test will have another clean copy.
+        File file = new File(TEST_DATA_FILE);
+        if ( file.exists() ) {
+            if ( ! file.delete() ) {
+                System.out.println("ERROR: Test data file '"+TEST_DATA_FILE+"'was not deleted, unit tests are compromised.");
+            }
+        }
+        else {
+            System.out.println("ERROR: File missing: " + TEST_DATA_FILE);
+        }
     }
 
 
@@ -1314,4 +1352,69 @@ public class TestContactManager {
         // re-ensure we have got all three correct.
         assertTrue(foundCorrect == 3);
     }
- } 
+ 
+    /**
+     * Create a copy of the original test file to the test file name to be used by all tests.
+     */
+    private void copyOriginalTestToTestFile() {
+        File originalFile = new File(ORIGINAL_TEST_DATA_FILE);
+        File copyFile     = new File(TEST_DATA_FILE);
+
+        // If we do not have the original file, this needs to be aborted
+        if ( !originalFile.exists() ) {
+            try {
+                throw new FileNotFoundException();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Create the copy new file.
+        if ( !copyFile.exists() ) {
+            try {
+                copyFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            // If copy file exists, deletes it first and then 
+            // creates a new one, to be sure we have a new clean file.
+            copyFile.delete();
+            try {
+                copyFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Load all data from original file and write into the copy file.
+        BufferedReader in = null;
+        FileWriter fileWriter = null;
+        try {
+            in = new BufferedReader(new FileReader(originalFile));
+            String line;
+            fileWriter = new FileWriter(copyFile);
+
+            while((line = in.readLine()) != null ) {
+               fileWriter.write(line);
+            }
+            fileWriter.flush();
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            if ( fileWriter != null )
+                try {
+                    fileWriter.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+        } finally {
+            try {
+                fileWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
