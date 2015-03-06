@@ -28,9 +28,20 @@ import org.json.simple.parser.ParseException;
  */
 public class ContactManagerImpl implements ContactManager {
     /**
+     * Default path for contacts.
+     */
+    private final String filePath = "src"+File.separator;
+
+    /**
      * The default data file name where all data is stored.
      */
     private final String fileName = "contacts.txt";
+
+    /**
+     * The constant file name to be used on all File handlers
+     * including the path.
+     */
+    private final String FILE_NAME = filePath + fileName;
 
     /**
      * The known key name to define Contact objects in file.
@@ -116,19 +127,16 @@ public class ContactManagerImpl implements ContactManager {
     // ***************************************************************************** //
     @Override
     public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
     public PastMeeting getPastMeeting(int id) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public FutureMeeting getFutureMeeting(int id) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -139,7 +147,6 @@ public class ContactManagerImpl implements ContactManager {
 
     @Override
     public List<Meeting> getFutureMeetingList(Contact contact) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -225,7 +232,7 @@ public class ContactManagerImpl implements ContactManager {
      */
     private void loadData() throws ParseException, IOException {
         // Create a local file handler
-        File file = new File(this.fileName);
+        File file = new File(FILE_NAME);
 
         // If no file, nothing to be loaded.
         if ( !file.exists() ) return;
@@ -395,7 +402,7 @@ public class ContactManagerImpl implements ContactManager {
     private void saveData() throws IOException {
 
         // Create a local File handler
-        File file = new File(this.fileName);
+        File file = new File(FILE_NAME);
 
         // Create a new file if the given does not exist.
         if ( !file.exists() ) {
