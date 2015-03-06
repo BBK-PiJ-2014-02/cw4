@@ -33,11 +33,6 @@ public class ContactManagerImpl implements ContactManager {
     private final String fileName = "contacts.txt";
 
     /**
-     * File handler
-     */
-    private final File file;
-    
-    /**
      * The known key name to define Contact objects in file.
      */
     private final String CONTACT_KEY = "contact";
@@ -74,8 +69,6 @@ public class ContactManagerImpl implements ContactManager {
      * Default constructor
      */
     public ContactManagerImpl() {
-        // Initialise the file handler
-        this.file = new File(this.fileName);
         this.contactId = 0;
         this.meetingId = 0;
         this.contactList = new HashSet<Contact>();
@@ -100,7 +93,6 @@ public class ContactManagerImpl implements ContactManager {
      * @param fileName the file to store all data
      */
     public ContactManagerImpl(String fileName) {
-        this.file = new File(fileName);
         this.contactId = 0;
         this.meetingId = 0;
         this.contactList = new HashSet<Contact>();
@@ -232,8 +224,11 @@ public class ContactManagerImpl implements ContactManager {
      * If the file does not exists, creates one.
      */
     private void loadData() throws ParseException, IOException {
+        // Create a local file handler
+        File file = new File(this.fileName);
+
         // If no file, nothing to be loaded.
-        if ( ! this.file.exists() ) return;
+        if ( !file.exists() ) return;
 
         // Prepare to load from file.
         BufferedReader in = null;
@@ -398,19 +393,23 @@ public class ContactManagerImpl implements ContactManager {
      */
     @SuppressWarnings("unchecked")
     private void saveData() throws IOException {
+
+        // Create a local File handler
+        File file = new File(this.fileName);
+
         // Create a new file if the given does not exist.
-        if ( ! this.file.exists() ) {
+        if ( !file.exists() ) {
             try {
-                this.file.createNewFile();
+                file.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         else {
             // If file exists, deletes it and creates a new one, to be sure we have a new clean file.
-            this.file.delete();
+            file.delete();
             try {
-                this.file.createNewFile();
+                file.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
