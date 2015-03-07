@@ -125,48 +125,79 @@ public class ContactManagerImpl implements ContactManager {
     // ***************************************************************************** //
     // *                             INTERFACE METHODS                             * //
     // ***************************************************************************** //
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
         return 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PastMeeting getPastMeeting(int id) {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FutureMeeting getFutureMeeting(int id) {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Meeting getMeeting(int id) {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Meeting> getFutureMeetingList(Contact contact) {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Meeting> getFutureMeetingList(Calendar date) {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<PastMeeting> getPastMeetingList(Contact contact) {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) { 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addMeetingNotes(int id, String text) {}
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addNewContact(String name, String notes) {
         Contact contact = new ContactImpl(this.contactId+1, name, notes);
@@ -174,6 +205,9 @@ public class ContactManagerImpl implements ContactManager {
         contactList.add(contact);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<Contact> getContacts(int... ids) {
         Set<Contact> result = new HashSet<Contact>();
@@ -189,6 +223,9 @@ public class ContactManagerImpl implements ContactManager {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<Contact> getContacts(String name) {
         return contactList.stream()
@@ -196,6 +233,9 @@ public class ContactManagerImpl implements ContactManager {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void flush() {
         try {
@@ -311,6 +351,7 @@ public class ContactManagerImpl implements ContactManager {
      * @return Meeting object
      */
     private Meeting toMeeting(JSONObject jsonObject) {
+        // TODO
         return null;
     }
     
