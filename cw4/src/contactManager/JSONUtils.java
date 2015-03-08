@@ -1,8 +1,19 @@
 package contactManager;
 
+import java.util.Calendar;
+
 import org.json.simple.JSONObject;
 
 public interface JSONUtils {
+	/**
+	 * Given a Calendar date, returns the JSONObject for given
+	 * date on year, month, day, hour, minute, second and millisecond.
+	 * 
+	 * @param date Calendar date
+	 * @return JSONOnject
+	 */
+	JSONObject toJSONObject(Calendar date);
+
 	/**
 	 * Given a Contact, returns the JSONObject for given Contact
 	 * in the JSONObject format, ready to be saved on the file.
@@ -21,6 +32,14 @@ public interface JSONUtils {
 	 */
 	JSONObject toJSONObject(Meeting meeting);
 
+	/**
+	 * Convert a JSONObject into a Calendar object.
+	 * 
+	 * @param jObject of type Calendar
+	 * @return Calendar
+	 */
+	Calendar toCalendar(JSONObject jObject);
+	
 	/**
 	 * Convert a JSONObject into a Contact object.
 	 * 

@@ -548,6 +548,7 @@ public class TestContactManager {
     @Test
     public void testGetMeetingId() { 
         Meeting meetingFound = contactManager.getMeeting(MEETING_ID_PRESENT);
+        // This meeting is expected to exist.
         assertNotNull(meetingFound);
         assertEquals(presentMeeting,meetingFound);
     }
