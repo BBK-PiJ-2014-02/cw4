@@ -1,7 +1,6 @@
 package contactManager;
 
 import org.json.simple.JSONObject;
-import org.json.simple.JSONStreamAware;
 
 public interface JSONUtils {
 	/**
