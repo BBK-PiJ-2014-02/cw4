@@ -380,13 +380,13 @@ public class TestContactManager {
     public void before() {
         // Contact initialisations.
         defaultContactInit();
-        
+
         // Calendar date initialisations.
         defaultCalendarInit();
-            
+
         // Meeting initialisations.
         defaultMeetingInit();
-        
+
         // Generate the Original test file if required.
         if (generateOriginalFile) generateOriginalFile();
 
@@ -547,10 +547,12 @@ public class TestContactManager {
      */ 
     @Test
     public void testGetMeetingId() { 
+        // Get the Meeting for the requested meeting id
         Meeting meetingFound = contactManager.getMeeting(MEETING_ID_PRESENT);
         // This meeting is expected to exist.
         assertNotNull(meetingFound);
-        assertEquals(presentMeeting,meetingFound);
+        // Ensure we have got the correct one.
+        verify(presentMeeting,meetingFound);
     }
         
     /** 
@@ -707,7 +709,7 @@ public class TestContactManager {
         // Ensure that the size is zero.
         assertTrue(emptyList.size() == 0);
     }
-    
+
     /** 
      * Check if returned list is chronologically sorted.
      */ 
@@ -1292,14 +1294,13 @@ public class TestContactManager {
             fw = new FileWriter(originalFile);
 
             // Adding all Contacts
-            JSONObject jContacts = new JSONObject();
-            jContacts.put(CONTACT_KEY, getContactsInJSONArray());
-            fw.append(jContacts.toJSONString());
+            JSONObject jObject = new JSONObject();
+            jObject.put(CONTACT_KEY, getContactsInJSONArray().toJSONString());
 
             // Adding all Meetings
-            JSONObject jMeetings = new JSONObject();
-            jMeetings.put(MEETING_KEY, getMeetingsInJSONArray());
-            fw.append(jMeetings.toJSONString());
+            jObject.put(MEETING_KEY, getMeetingsInJSONArray().toJSONString());
+
+            fw.append(jObject.toJSONString());
 
             // Saving results
             fw.flush();
@@ -1515,5 +1516,68 @@ public class TestContactManager {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Verify if expected meeting match the found meeting
+     * 
+     * @param expected Meeting
+     * @param found Meeting
+     */
+    private void verify(Meeting expected, Meeting found) {
+        // found cannot be null
+        assertNotNull(found);
+
+        // Meeting ids much match
+        assertEquals(expected.getId(),found.getId());
+
+        // Dates much match
+        verify(expected.getDate(),found.getDate());
+
+        // Checking through the contact list
+        int matchingContactsExpected = found.getContacts().size();
+        int matchedContactsFound     = 0;
+
+        for( Contact contactFound : found.getContacts() ) {
+            for( Contact contactExpected : expected.getContacts() ) {
+                if( contactFound.getId() == contactExpected.getId() ) {
+                    verify(contactExpected,contactFound);
+                    // Increment the matched Contacts found and jump to next contactFound
+                    matchedContactsFound++;
+                    break;
+                }
+            }
+        }
+
+        assertTrue(matchingContactsExpected == matchedContactsFound);
+    }
+
+    /**
+     * Verify if the expected Contact matched with the found one.
+     * 
+     * @param expected Contact
+     * @param found Contact
+     */
+    private void verify(Contact expected, Contact found) {
+        assertNotNull(found);
+        assertEquals(expected.getId(),found.getId());
+        assertEquals(expected.getName(),found.getName());
+        assertEquals(expected.getNotes(),found.getNotes());
+    }
+
+    /**
+     * Verify if expected date matched the found Calendar date.
+     * 
+     * @param expected Calendar date
+     * @param found Calendar date
+     */
+    private void verify(Calendar expected, Calendar found) {
+        assertNotNull(found);
+        assertEquals(expected.get(Calendar.YEAR),found.get(Calendar.YEAR));
+        assertEquals(expected.get(Calendar.MONTH),found.get(Calendar.MONTH));
+        assertEquals(expected.get(Calendar.DAY_OF_MONTH),found.get(Calendar.DAY_OF_MONTH));
+        assertEquals(expected.get(Calendar.HOUR_OF_DAY),found.get(Calendar.HOUR_OF_DAY));
+        assertEquals(expected.get(Calendar.MINUTE),found.get(Calendar.MINUTE));
+        assertEquals(expected.get(Calendar.SECOND),found.get(Calendar.SECOND));
     }
 }
