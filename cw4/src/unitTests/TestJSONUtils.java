@@ -143,7 +143,7 @@ public class TestJSONUtils {
     @Test
     public void testJSONObjectToContact() {
         Contact foundContact = jUtils.toContact(jContact);
-        verifyContacts(contact,foundContact);
+        verifyContact(contact,foundContact);
     }
 
     /**
@@ -162,11 +162,34 @@ public class TestJSONUtils {
      * @param expected Contact
      * @param found Contact
      */
-    private void verifyContacts(Contact expected, Contact found) {
+    private void verifyContact(Contact expected, Contact found) {
        assertNotNull(found);
        assertEquals(expected.getId(),found.getId());
        assertEquals(expected.getName(),found.getName());
        assertEquals(expected.getNotes(),found.getNotes());
+    }
+
+    /**
+     * Asserting that the expected list of contacts matches the found list of contacts 
+     * in same order and contents.
+     * 
+     * @param expected Contacts
+     * @param found Contacts
+     */
+    private void verifyContactList(Set<Contact> expected, Set<Contact> found) {
+       assertNotNull(found);
+       assertTrue(expected.size() >= found.size());
+
+       // Ensure we have one and only one of the expected contacts in the found list,
+       // matching on id, name and notes.
+       for( Contact expectedContact : expected ) {
+           assertTrue(found.stream()
+                   .filter( contact -> 
+                       contact.getId() == expectedContact.getId() && 
+                       contact.getName().equals(expectedContact.getName()) &&
+                       contact.getNotes().equals(expectedContact.getNotes()) 
+                    ).count() == 1);
+       }
     }
 
     /**
@@ -179,6 +202,7 @@ public class TestJSONUtils {
        assertNotNull(found);
        assertEquals(expected.getId(),found.getId());
        assertEquals(expected.getDate(),found.getDate());
-       assertEquals(expected.getContacts(),found.getContacts());
+
+       verifyContactList(expected.getContacts(),found.getContacts());
     }
 }
