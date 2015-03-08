@@ -3,7 +3,7 @@ package contactManager;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
-public interface JSONUtils extends JSONStreamAware {
+public interface JSONUtils {
 	/**
 	 * Given a Contact, returns the JSONObject for given Contact
 	 * in the JSONObject format, ready to be saved on the file.
