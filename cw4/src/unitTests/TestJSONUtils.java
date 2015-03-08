@@ -1,6 +1,8 @@
 package unitTests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -26,6 +28,11 @@ public class TestJSONUtils {
     private JSONUtils jUtils;
     
     /**
+     * Calendar date to convert to JSONObject.
+     */
+    private Calendar date;
+
+    /**
      * Contact to convert to JSONObject.
      */
     private Contact contact;
@@ -34,6 +41,11 @@ public class TestJSONUtils {
      * Meeting to convert to JSONObject.
      */
     private Meeting meeting;
+
+    /**
+     * The JSONObject with the date information.
+     */
+    private JSONObject jDate;
     
     /**
      * The JSONObject with the contact information.
@@ -44,7 +56,37 @@ public class TestJSONUtils {
      * The JSONObject with the meeting information.
      */
     private JSONObject jMeeting;
-    
+
+    /**
+     * Calendar Year.
+     */
+    private final Integer YEAR = 2020;
+
+    /**
+     * Calendar Month.
+     */
+    private final Integer MONTH = 8;
+
+    /**
+     * Calendar Day.
+     */
+    private final Integer DAY = 24;
+
+    /**
+     * Calendar Hour.
+     */
+    private final Integer HOUR = 23;
+
+    /**
+     * Calendar Minute.
+     */
+    private final Integer MINUTE = 21;
+
+    /**
+     * Calendar Second.
+     */
+    private final Integer SECOND = 42;
+
     /**
      * The contact id.
      */
@@ -66,11 +108,6 @@ public class TestJSONUtils {
     private final Integer MEETING_ID = 122;
 
     /**
-     * The meeting date.
-     */
-    private Calendar MEETING_DATE;
-
-    /**
      * The meeting contacts.
      */
     private Set<Contact> MEETING_CONTACTS;
@@ -82,9 +119,18 @@ public class TestJSONUtils {
     @SuppressWarnings("unchecked")
     @Before
     public void before() {
-        // Initialise the date with any date.
-        MEETING_DATE = new GregorianCalendar();
-        MEETING_DATE.set(2015, 12, 23);
+        // Initialise date.
+        date = new GregorianCalendar();
+        date.set(YEAR,MONTH,DAY,HOUR,MINUTE,SECOND);
+
+        // Initialize jDate
+        jDate = new JSONObject();
+        jDate.put("year", YEAR);
+        jDate.put("month", MONTH);
+        jDate.put("day", DAY);
+        jDate.put("hour", HOUR);
+        jDate.put("minute", MINUTE);
+        jDate.put("second", SECOND);
         
         // Initialise the contact with any same contact info
         contact = new ContactImpl(CONTACT_ID, CONTACT_NAME, CONTACT_NOTES);
@@ -95,7 +141,7 @@ public class TestJSONUtils {
         MEETING_CONTACTS = new HashSet<Contact>();
         MEETING_CONTACTS.add(contact);
         try {
-            meeting = new MeetingImpl(MEETING_ID, MEETING_DATE, MEETING_CONTACTS);
+            meeting = new MeetingImpl(MEETING_ID, date, MEETING_CONTACTS);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -109,9 +155,11 @@ public class TestJSONUtils {
         // Set the structure for the JSONObject type contact
         jMeeting = new JSONObject();
         jMeeting.put("id", MEETING_ID);
-        jMeeting.put("date", MEETING_DATE);
+        jMeeting.put("date", jUtils.toJSONObject(date));
+
         JSONArray jA = new JSONArray();
-        jA.add(jContact);
+                  jA.add(jContact);
+
         jMeeting.put("contacts", jA);
 
         // Initialise the JSONUtils class object.
@@ -122,26 +170,26 @@ public class TestJSONUtils {
      * Test if given Contact is correctly converted to a JSONObject.
      */
     @Test
-    public void testContactToJSONObject() { 
+    public void testToJSONObjectFromContact() { 
         JSONObject foundJO = jUtils.toJSONObject(contact);
         assertEquals(jContact,foundJO);
     }
+
     /**
      * Test if given Meeting is correctly converted to a JSONObject.
      */
     @Test
-    public void testToMeetingJSONObject() {
+    public void testToJSONObjectFromMeeting() {
         JSONObject foundJO = jUtils.toJSONObject(meeting);
         assertEquals(jMeeting,foundJO);
-        
     }
-    
+
     /**
      * Given a JSONObject with Contact values, check if the returned
      * matches the original expected Contact.
      */
     @Test
-    public void testJSONObjectToContact() {
+    public void testToContactFromJSON() {
         Contact foundContact = jUtils.toContact(jContact);
         verifyContact(contact,foundContact);
     }
@@ -151,9 +199,29 @@ public class TestJSONUtils {
      * matches the original expected Meeting.
      */
     @Test
-    public void testJSONObjectToMeeting() {
+    public void testToMeetingFromJSON() {
         Meeting meetingFound = jUtils.toMeeting(jMeeting);
         verifyMeetings(meeting,meetingFound);
+    }
+
+    /**
+     * Given a Calendar date, check if the returned Object
+     * matched the expected.
+     */
+    @Test
+    public void testToJSONObjectFromCalendar() {
+        JSONObject foundJO = jUtils.toJSONObject(date);
+        verifyDate(jDate, foundJO);
+    }
+
+    /**
+     * Given a JSON Object of type calendar, check that
+     * the returned Calendar object matches expected.
+     */
+    @Test
+    public void testToCalendarFromJSON() {
+        Calendar found = jUtils.toCalendar(jDate);
+        verifyDate(date, found);
     }
 
     /**
@@ -177,19 +245,19 @@ public class TestJSONUtils {
      * @param found Contacts
      */
     private void verifyContactList(Set<Contact> expected, Set<Contact> found) {
-       assertNotNull(found);
-       assertTrue(expected.size() >= found.size());
+        assertNotNull(found);
+        assertTrue(expected.size() >= found.size());
 
-       // Ensure we have one and only one of the expected contacts in the found list,
-       // matching on id, name and notes.
-       for( Contact expectedContact : expected ) {
-           assertTrue(found.stream()
-                   .filter( contact -> 
-                       contact.getId() == expectedContact.getId() && 
-                       contact.getName().equals(expectedContact.getName()) &&
-                       contact.getNotes().equals(expectedContact.getNotes()) 
-                    ).count() == 1);
-       }
+        // Ensure we have one and only one of the expected contacts in the found list,
+        // matching on id, name and notes.
+        for( Contact expectedContact : expected ) {
+            assertTrue(found.stream()
+                    .filter( contact -> 
+                        contact.getId() == expectedContact.getId() && 
+                        contact.getName().equals(expectedContact.getName()) &&
+                        contact.getNotes().equals(expectedContact.getNotes()) 
+                     ).count() == 1);
+        }
     }
 
     /**
@@ -199,10 +267,43 @@ public class TestJSONUtils {
      * @param found Meeting
      */
     private void verifyMeetings(Meeting expected, Meeting found) {
-       assertNotNull(found);
-       assertEquals(expected.getId(),found.getId());
-       assertEquals(expected.getDate(),found.getDate());
+        assertNotNull(found);
+        assertEquals(expected.getId(),found.getId());
+        verifyDate(expected.getDate(),found.getDate());
+        verifyContactList(expected.getContacts(),found.getContacts());
+    }
 
-       verifyContactList(expected.getContacts(),found.getContacts());
+    /**
+     * Check that two calendar dates are the same on year, month, day, 
+     * hour, minute, second and millisecond.
+     * 
+     * @param expected Calendar date
+     * @param found Calendar date
+     */
+    private void verifyDate(Calendar expected, Calendar found) {
+        assertNotNull(found);
+        assertEquals(expected.get(Calendar.YEAR),found.get(Calendar.YEAR));
+        assertEquals(expected.get(Calendar.MONTH),found.get(Calendar.MONTH));
+        assertEquals(expected.get(Calendar.DAY_OF_MONTH),found.get(Calendar.DAY_OF_MONTH));
+        assertEquals(expected.get(Calendar.HOUR),found.get(Calendar.HOUR));
+        assertEquals(expected.get(Calendar.MINUTE),found.get(Calendar.MINUTE));
+        assertEquals(expected.get(Calendar.SECOND),found.get(Calendar.SECOND));
+    }
+
+    /**
+     * Check that two JSONObjects dates are the same on year, month, day, 
+     * hour, minute, second and millisecond.
+     * 
+     * @param expected JSONObject date
+     * @param found JSONObject date
+     */
+    private void verifyDate(JSONObject expected, JSONObject found) {
+        assertNotNull(found);
+        assertEquals(expected.get("year"),found.get("year"));
+        assertEquals(expected.get("month"),found.get("month"));
+        assertEquals(expected.get("day"),found.get("day"));
+        assertEquals(expected.get("hour"),found.get("hour"));
+        assertEquals(expected.get("minute"),found.get("minute"));
+        assertEquals(expected.get("second"),found.get("second"));
     }
 }
