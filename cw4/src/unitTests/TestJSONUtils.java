@@ -1,6 +1,6 @@
 package unitTests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -143,7 +143,7 @@ public class TestJSONUtils {
     @Test
     public void testJSONObjectToContact() {
         Contact foundContact = jUtils.toContact(jContact);
-        assertEquals(contact,foundContact);
+        verifyContacts(contact,foundContact);
     }
 
     /**
@@ -153,6 +153,32 @@ public class TestJSONUtils {
     @Test
     public void testJSONObjectToMeeting() {
         Meeting meetingFound = jUtils.toMeeting(jMeeting);
-        assertEquals(meeting,meetingFound);
+        verifyMeetings(meeting,meetingFound);
+    }
+
+    /**
+     * Asserting that the information is the same, regardless of the object address.
+     * 
+     * @param expected Contact
+     * @param found Contact
+     */
+    private void verifyContacts(Contact expected, Contact found) {
+       assertNotNull(found);
+       assertEquals(expected.getId(),found.getId());
+       assertEquals(expected.getName(),found.getName());
+       assertEquals(expected.getNotes(),found.getNotes());
+    }
+
+    /**
+     * Asserting that the information on the Meetings match.
+     * 
+     * @param expected Meeting
+     * @param found Meeting
+     */
+    private void verifyMeetings(Meeting expected, Meeting found) {
+       assertNotNull(found);
+       assertEquals(expected.getId(),found.getId());
+       assertEquals(expected.getDate(),found.getDate());
+       assertEquals(expected.getContacts(),found.getContacts());
     }
 }
