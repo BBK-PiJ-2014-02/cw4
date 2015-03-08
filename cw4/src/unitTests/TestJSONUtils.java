@@ -155,7 +155,7 @@ public class TestJSONUtils {
         // Set the structure for the JSONObject type contact
         jMeeting = new JSONObject();
         jMeeting.put("id", MEETING_ID);
-        jMeeting.put("date", jUtils.toJSONObject(date));
+        jMeeting.put("date", jDate);
 
         JSONArray jA = new JSONArray();
                   jA.add(jContact);
