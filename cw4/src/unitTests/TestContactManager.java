@@ -19,7 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.After;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,6 +30,8 @@ import contactManager.ContactManager;
 import contactManager.ContactManagerImpl;
 import contactManager.FutureMeeting;
 import contactManager.FutureMeetingImpl;
+import contactManager.JSONUtils;
+import contactManager.JSONUtilsImpl;
 import contactManager.Meeting;
 import contactManager.MeetingImpl;
 import contactManager.PastMeeting;
@@ -44,6 +47,17 @@ import contactManager.PastMeetingImpl;
  */
 public class TestContactManager {
     /**
+     * The JSON Utils handler.
+     */
+    private final JSONUtils jUtils = new JSONUtilsImpl();
+
+    /**
+     * When this flag is set to true, the original file will be regenerated new,
+     * using currently set variables below for Contacts and Meetings.
+     */
+    public static boolean generateOriginalFile = true;
+
+    /**
      * Path to the test files.
      */
     private final String TEST_FILE_PATH = "src"+File.separatorChar+"unitTests"+File.separatorChar;
@@ -57,6 +71,16 @@ public class TestContactManager {
      * The temporary copy of the original test data file for processing.
      */
     private final String TEST_DATA_FILE = TEST_FILE_PATH + "test_data.txt";
+
+    /**
+     * The known key name to define Contact objects in file.
+     */
+    private final String CONTACT_KEY = "contact";
+
+    /**
+     * The known key name to define Meeting objects in file.
+     */
+    private final String MEETING_KEY = "meeting";
 
     // ***************************************************************************** //
     // *                                  CONTACTS                                 * //
@@ -119,7 +143,7 @@ public class TestContactManager {
      * New contact to be added, not in the list.
      */
     private final String CONTACT_NAME_NEW = "John New Smith";
-    
+
     /**
      * New contact notes.
      */
@@ -345,12 +369,15 @@ public class TestContactManager {
     // ********************************** BEFORE ********************************* //
     /**
      * Loading all needed values to be ready for each test.
+     * 
+     * Requested synchronisation to prevent multiple test threads requesting
+     * original test file generation at same or different times, conflicting
+     * with other tests, and thus invalidating test results.
+     * 
+     * Once the contactManager is initialized, files can change freely.
      */
     @Before
     public void before() {
-        // Create a copy of the original test file into the test file to be used
-        copyOriginalTestToTestFile();
-
         // Contact initialisations.
         defaultContactInit();
         
@@ -360,27 +387,14 @@ public class TestContactManager {
         // Meeting initialisations.
         defaultMeetingInit();
         
+        // Generate the Original test file if required.
+        if (generateOriginalFile) generateOriginalFile();
+
+        // Create a copy of the original test file into the test file to be used
+        copyOriginalTestToTestFile();
+
         // Initialising contactManager.
         contactManager = new ContactManagerImpl(TEST_DATA_FILE);
-    }
-
-
-    // ********************************** AFTER ********************************* //
-    /**
-     * After each test, do the cleanup before starting with the next.
-     */
-    @After
-    public void after() {
-        // Delete the test data file to ensure next test will have another clean copy.
-        File file = new File(TEST_DATA_FILE);
-        if ( file.exists() ) {
-            if ( ! file.delete() ) {
-                System.out.println("ERROR: Test data file '"+TEST_DATA_FILE+"'was not deleted, unit tests are compromised.");
-            }
-        }
-        else {
-            System.out.println("ERROR: File missing: " + TEST_DATA_FILE);
-        }
     }
 
 
@@ -1248,6 +1262,89 @@ public class TestContactManager {
     //                                                                              //
     // **************************************************************************** //
     
+    /**
+     * Generate the original test file data from the available private variable states
+     * expected to exist in memory, for when the tests run.
+     */
+    @SuppressWarnings("unchecked")
+    private void generateOriginalFile() {
+        // If the file is not requested to be generated, return.
+        if(!generateOriginalFile) return;
+
+        // The original test file
+        File originalFile = new File(ORIGINAL_TEST_DATA_FILE);
+
+        // If the file does not exist, create it.
+        if( !originalFile.exists() ) {
+            try {
+                originalFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Prepare a file writer.
+        FileWriter fw = null;
+        try {
+            // Initialize the file writer for the original file.
+            fw = new FileWriter(originalFile);
+
+            // Adding all Contacts
+            JSONObject jContacts = new JSONObject();
+            jContacts.put(CONTACT_KEY, getContactsInJSONArray());
+            fw.append(jContacts.toJSONString());
+
+            // Adding all Meetings
+            JSONObject jMeetings = new JSONObject();
+            jMeetings.put(MEETING_KEY, getMeetingsInJSONArray());
+            fw.append(jMeetings.toJSONString());
+
+            // Saving results
+            fw.flush();
+            fw.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Original file is generated only once before all tests run.
+        // Subsequent loads come from the copied TEST_DATA_FILE.
+        generateOriginalFile = false;
+    }
+
+    /**
+     * Converting all listed Contacts into the JSONArray format
+     * to be then saved into the original test file.
+     * 
+     * @return JSONArray of all Contacts
+     */
+    @SuppressWarnings("unchecked")
+    private JSONArray getContactsInJSONArray() {
+        JSONArray jArray = new JSONArray();
+        Contact past = new ContactImpl(CONTACT_ID_PAST, CONTACT_NAME_PAST, CONTACT_NOTES_PAST);
+        Contact present = new ContactImpl(CONTACT_ID_PRESENT, CONTACT_NAME_PRESENT, CONTACT_NOTES_PRESENT);
+        Contact future = new ContactImpl(CONTACT_ID_FUTURE, CONTACT_NAME_FUTURE, CONTACT_NOTES_FUTURE);
+        jArray.add(jUtils.toJSONObject(past));
+        jArray.add(jUtils.toJSONObject(present));
+        jArray.add(jUtils.toJSONObject(future));
+        return jArray;
+    }
+
+    /**
+     * Converting all listed Meetings into the JSONArray format
+     * to be then saved into the original test file.
+     * 
+     * @return JSONArray of all Meetings
+     */
+    @SuppressWarnings("unchecked")
+    private JSONArray getMeetingsInJSONArray() {
+        JSONArray jMeetings = new JSONArray();
+        jMeetings.add(jUtils.toJSONObject(pastMeeting));
+        jMeetings.add(jUtils.toJSONObject(presentMeeting));
+        jMeetings.add(jUtils.toJSONObject(futureMeeting));
+        return jMeetings;
+    }
+
     /**
      * Initialise all meetings with the default values.
      */
