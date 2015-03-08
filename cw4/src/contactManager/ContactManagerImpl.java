@@ -6,12 +6,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,7 +39,7 @@ public class ContactManagerImpl implements ContactManager {
      * The constant file name to be used on all File handlers
      * including the path.
      */
-    private final String FILE_NAME = filePath + fileName;
+    private String filePathName = filePath + fileName;
 
     /**
      * The known key name to define Contact objects in file.
@@ -104,6 +102,7 @@ public class ContactManagerImpl implements ContactManager {
      * @param fileName the file to store all data
      */
     public ContactManagerImpl(String fileName) {
+        filePathName = fileName;
         this.contactId = 0;
         this.meetingId = 0;
         this.contactList = new HashSet<Contact>();
@@ -155,6 +154,12 @@ public class ContactManagerImpl implements ContactManager {
      */
     @Override
     public Meeting getMeeting(int id) {
+        // Get the meeting with the requested meeting id.
+        for( Meeting meetingFound : meetingList ) {
+            if ( meetingFound.getId() == id ) return meetingFound;
+        }
+        System.out.println("meetinglist: "+meetingList.toString());
+        // If all the above fails, return null.
         return null;
     }
 
@@ -271,8 +276,11 @@ public class ContactManagerImpl implements ContactManager {
      * If the file does not exists, creates one.
      */
     private void loadData() throws ParseException, IOException {
+        // Create a new instance of the JUtils.
+        JSONUtils jUtils = new JSONUtilsImpl();
+
         // Create a local file handler
-        File file = new File(FILE_NAME);
+        File file = new File(filePathName);
 
         // If no file, nothing to be loaded.
         if ( !file.exists() ) return;
@@ -285,8 +293,6 @@ public class ContactManagerImpl implements ContactManager {
             while((line = in.readLine()) != null ) {
                 JSONParser parser = new JSONParser();
                 JSONObject jo     = (JSONObject) parser.parse(line);
-                // If the json object is null, go to next line.
-                if ( jo == null ) continue;
 
                 // If the json object is not null, collect the key values and then 
                 // loop through them, converting the values into the expected object form
@@ -300,10 +306,7 @@ public class ContactManagerImpl implements ContactManager {
                     String joKey = joIterator.next().toString();
 
                     // Grab the value associated to the above key
-                    JSONArray joArray = (JSONArray) jo.get(joKey);
-
-                    // No need for further processing if nothing found
-                    if ( joArray == null ) continue;
+                    JSONArray joArray = (JSONArray) parser.parse(jo.get(joKey).toString());
 
                     // Instantiate a new JSON Object element
                     JSONObject element = new JSONObject();
@@ -316,7 +319,7 @@ public class ContactManagerImpl implements ContactManager {
                            // Loop through all elements and load them into the contactList.
                            for( int i = 0; i < joArray.size(); i++ ) {
                                element = (JSONObject) joArray.get(i);
-                               contactList.add(toContact(element));
+                               contactList.add(jUtils.toContact(element));
                            }
                            break;
                         }
@@ -325,7 +328,7 @@ public class ContactManagerImpl implements ContactManager {
                             // Loop through all elements and load them into the meetingList.
                             for( int i = 0; i < joArray.size(); i++ ) {
                                 element = (JSONObject) joArray.get(i);
-                                meetingList.add(toMeeting(element));
+                                meetingList.add(jUtils.toMeeting(element));
                             }
                             break;
                         }
@@ -345,96 +348,6 @@ public class ContactManagerImpl implements ContactManager {
     }
 
     /**
-     * Converts given JSONObject with expected Contact labelled info, into a Meeting Object
-     * 
-     * @param jsonObject the JSON object
-     * @return Meeting object
-     */
-    private Meeting toMeeting(JSONObject jsonObject) {
-        // TODO
-        return null;
-    }
-    
-    /**
-     * Converts given JSONObject with expected Contact labelled info into a Contact
-     * 
-     * @param jsonObject the JSON object
-     * @return Contact object
-     */
-    private Contact toContact(JSONObject jsonObject) {
-        // Contact needs id, name and notes
-        String name  = jsonObject.get("name").toString();
-        String notes = jsonObject.get("notes").toString();
-        Integer id   = Integer.valueOf(jsonObject.get("id").toString());
-
-        // Now that we have all elements, create a new Contact with them
-        Contact newContact = new ContactImpl(id, name, notes);
-
-        return newContact;
-    }
-
-    /**
-     * Converts given Meeting object into a JSONObject
-     * 
-     * @param contact the Meeting object
-     * @return JSONObject
-     */
-    @SuppressWarnings("unchecked")
-    private JSONObject toJSONObject(Meeting meeting) {
-        // The final JSONObject to be returned.
-        JSONObject jsonObject = new JSONObject();
-
-        // If meeting is null, just return an empty JSONObject
-        if ( meeting == null ) return jsonObject;
-
-        // Constructing the Map to add.
-        Map<String,String> meetingMap = new HashMap<String, String>();
-        meetingMap.put("id", ( new Integer(meeting.getId()) ).toString() );
-
-        JSONArray jContacts = new JSONArray();
-        for( Contact contact : meeting.getContacts() ) {
-            Map<String,String> mContact = new HashMap<String, String>();
-            mContact.put("id", (Integer.valueOf(contact.getId())).toString());
-            mContact.put("name", contact.getName());
-            mContact.put("notes", contact.getNotes());
-            jContacts.add(mContact);
-        }
-
-        meetingMap.put("date", ( meeting.getDate() ).toString());
-        meetingMap.put("contacts", jContacts.toJSONString());
-
-        // Adding the constructed map.
-        jsonObject.putAll(meetingMap);
-
-        // Returning the constructed JSONObject.
-        return jsonObject;
-    }
-
-    /**
-     * Converts given Contact object into a JSONObject
-     * 
-     * @param contact the Contact object
-     * @return JSONObject
-     */
-    @SuppressWarnings("unchecked")
-    private JSONObject toJSONObject(Contact contact) {
-        // The final JSONObject to be returned.
-        JSONObject jsonObject = new JSONObject();
-
-        // Constructing the Map to add.
-        Map<String,String> contactMap = new HashMap<String, String>();
-        contactMap.put("id", ( new Integer(contact.getId()) ).toString() );
-        contactMap.put("name", contact.getName());
-        contactMap.put("notes", contact.getNotes());
-
-        // Adding the constructed map.
-        jsonObject.putAll(contactMap);
-
-        // Returning the constructed JSONObject.
-        return jsonObject;
-    }
-
-    /**
      * Saves all data from memory into file.
      * 
      * If the file does not exists, creates one.
@@ -443,7 +356,7 @@ public class ContactManagerImpl implements ContactManager {
     private void saveData() throws IOException {
 
         // Create a local File handler
-        File file = new File(FILE_NAME);
+        File file = new File(filePathName);
 
         // Create a new file if the given does not exist.
         if ( !file.exists() ) {
@@ -465,12 +378,13 @@ public class ContactManagerImpl implements ContactManager {
 
         // Final JSONObject to save into file
         JSONObject jFinal = new JSONObject();
+        JSONUtils jUtils = new JSONUtilsImpl();
 
         // Save all contacts into jContactsArray
         Iterator<Contact> contactsIterator = contactList.iterator();
         JSONArray jContactsArray = new JSONArray();
         while( contactsIterator.hasNext() ) {
-            jContactsArray.add(toJSONObject(contactsIterator.next()));
+            jContactsArray.add(jUtils.toJSONObject(contactsIterator.next()));
         }
 
         // Finalise Contacts.
@@ -478,8 +392,8 @@ public class ContactManagerImpl implements ContactManager {
 
         // Save all meetings into jMeetingsArray
         JSONArray jMeetingsArray = new JSONArray();
-        for( Meeting m : meetingList ) {
-            jMeetingsArray.add(toJSONObject(m));
+        for( Meeting meeting : meetingList ) {
+            jMeetingsArray.add(jUtils.toJSONObject(meeting));
         }
 
         // Finalise Meetings.
