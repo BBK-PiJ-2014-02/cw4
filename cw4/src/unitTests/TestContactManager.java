@@ -482,7 +482,7 @@ public class TestContactManager {
     @Test
     public void testGetContactsByIds() { 
         // Get the list of contacts for the three ids to check
-        Set<Contact> contactListFound = contactManager.getContacts(CONTACT_ID_NEW,
+        Set<Contact> contactListFound = contactManager.getContacts(CONTACT_ID_PAST,
                 CONTACT_ID_SINGLE_SEARCH_RESULT,CONTACT_ID_MULTIPLE_SEARCH_RESULT);
 
         verifyDefaultContactList(contactListFound);
@@ -1324,12 +1324,11 @@ public class TestContactManager {
     @SuppressWarnings("unchecked")
     private JSONArray getContactsInJSONArray() {
         JSONArray jArray = new JSONArray();
-        Contact past = new ContactImpl(CONTACT_ID_PAST, CONTACT_NAME_PAST, CONTACT_NOTES_PAST);
-        Contact present = new ContactImpl(CONTACT_ID_PRESENT, CONTACT_NAME_PRESENT, CONTACT_NOTES_PRESENT);
-        Contact future = new ContactImpl(CONTACT_ID_FUTURE, CONTACT_NAME_FUTURE, CONTACT_NOTES_FUTURE);
-        jArray.add(jUtils.toJSONObject(past));
-        jArray.add(jUtils.toJSONObject(present));
-        jArray.add(jUtils.toJSONObject(future));
+        jArray.add(jUtils.toJSONObject(pastContact));
+        jArray.add(jUtils.toJSONObject(presentContact));
+        jArray.add(jUtils.toJSONObject(futureContact));
+        contactList.stream().forEach(contact -> jArray.add(jUtils.toJSONObject(contact)));
+        multipleContactList.stream().forEach(contact -> jArray.add(jUtils.toJSONObject(contact)));
         return jArray;
     }
 
@@ -1380,14 +1379,10 @@ public class TestContactManager {
         // Adding all contacts existing to the contactList to be acted upon.
         contactList.add(new ContactImpl(CONTACT_ID_SINGLE_SEARCH_RESULT, 
                 CONTACT_NAME_SINGLE_SEARCH_RESULT, CONTACT_NOTES_SINGLE));
-        contactList.add(new ContactImpl(CONTACT_ID_SINGLE_SEARCH_RESULT, 
-                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, CONTACT_NOTES_MULTIPLE));
 
         // The multiple list search result expected.
         multipleContactList.add(new ContactImpl(CONTACT_ID_MULTIPLE_SEARCH_RESULT, 
-                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, CONTACT_NOTES_NEW));
-        multipleContactList.add(new ContactImpl(CONTACT_ID_NEW, CONTACT_NAME_NEW, 
-                CONTACT_NOTES_NEW));
+                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, CONTACT_NOTES_MULTIPLE));
 
         // Initialise past, present and future contact.
         pastContact         = new ContactImpl(CONTACT_ID_PAST, CONTACT_NAME_PAST, CONTACT_NOTES_PAST);
@@ -1422,20 +1417,20 @@ public class TestContactManager {
 
         // Expected three records to be correctly matched.
         int foundCorrect = 0;
-        
+
         // Check details as per the contact id returned of each one of them
         for(int i = 0; i < contactListFound.size(); i++ ) {
             Contact contactFound = contactListFound.iterator().next();
-            if ( contactFound.getId() == CONTACT_ID_MULTIPLE_SEARCH_RESULT ) {
+            if ( contactFound.getId() == CONTACT_ID_PAST ) {
+                assertTrue(contactFound.getId() == CONTACT_ID_PAST);
+                assertEquals(contactFound.getName(),CONTACT_NAME_PAST);
+                assertEquals(contactFound.getNotes(),CONTACT_NOTES_PAST);
+                foundCorrect++;
+            }
+            else if ( contactFound.getId() == CONTACT_ID_MULTIPLE_SEARCH_RESULT ) {
                 assertTrue(contactFound.getId() == CONTACT_ID_MULTIPLE_SEARCH_RESULT);
                 assertEquals(contactFound.getName(),CONTACT_NAME_MULTIPLE_SEARCH_RESULT);
                 assertEquals(contactFound.getNotes(),CONTACT_NOTES_MULTIPLE);
-                foundCorrect++;
-            }
-            else if ( contactFound.getId() == CONTACT_ID_NEW ) {
-                assertTrue(contactFound.getId() == CONTACT_ID_NEW);
-                assertEquals(contactFound.getName(),CONTACT_NAME_NEW);
-                assertEquals(contactFound.getNotes(),CONTACT_NOTES_NEW);
                 foundCorrect++;
             }
             else if ( contactFound.getId() == CONTACT_ID_SINGLE_SEARCH_RESULT ){
