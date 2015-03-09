@@ -460,8 +460,8 @@ public class TestContactManager {
      */ 
     @Test
     public void testGetContactsById() { 
-        // Search for the one contact id.
-        Set<Contact> contactListFound = contactManager.getContacts(CONTACT_ID_NEW);
+        // Search for the one contact id that should definitely be in memory.
+        Set<Contact> contactListFound = contactManager.getContacts(CONTACT_ID_PAST);
         
         // Ensure null was not returned
         assertNotNull(contactListFound);
@@ -471,9 +471,9 @@ public class TestContactManager {
         
         // Retrieve the contact info to check if it matches to the result we expect
         Contact contactFound = contactListFound.iterator().next();
-        assertTrue(contactFound.getId() == CONTACT_ID_NEW);
-        assertEquals(contactFound.getName(),CONTACT_NAME_NEW);
-        assertEquals(contactFound.getNotes(),CONTACT_NOTES_NEW);
+        assertTrue(contactFound.getId() == CONTACT_ID_PAST);
+        assertEquals(contactFound.getName(),CONTACT_NAME_PAST);
+        assertEquals(contactFound.getNotes(),CONTACT_NOTES_PAST);
     }
 
     /** 

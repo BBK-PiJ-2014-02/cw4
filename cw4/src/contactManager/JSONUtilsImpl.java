@@ -12,7 +12,7 @@ import org.json.simple.JSONObject;
 /**
  * Implementation of the JSONUtils interface.
  * 
- * Refactoring the JSON computation between JSON Objects and Contacts
+ * Re-factoring the JSON computation between JSON Objects and Contacts
  * and JSON Objects and Meeting and vice-versa conversions, required
  * by the contactManager, when saving and loading to / from file.
  * 
