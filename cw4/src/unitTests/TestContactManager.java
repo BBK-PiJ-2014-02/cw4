@@ -15,9 +15,11 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -365,7 +367,6 @@ public class TestContactManager {
      */
     private ContactManager contactManager;
 
-    
     // ********************************** BEFORE ********************************* //
     /**
      * Loading all needed values to be ready for each test.
@@ -438,7 +439,7 @@ public class TestContactManager {
         // the test would fail at this point.
         assertTrue(foundContact);
     }
-    
+
     /** 
      * Test exception on name null.
      */ 
@@ -446,7 +447,7 @@ public class TestContactManager {
     public void testAddNewContactNullName() { 
         contactManager.addNewContact(NULL_NAME, CONTACT_NOTES_NEW);
     }
-    
+
     /** 
      * Test exception on notes null.
      */ 
@@ -454,7 +455,7 @@ public class TestContactManager {
     public void testAddNewContactNullNotes() {
         contactManager.addNewContact(CONTACT_NAME_NEW, NULL_NOTES);
     }
-    
+
     /** 
      * Check if the contact returned corresponds to the given id.
      */ 
@@ -462,13 +463,13 @@ public class TestContactManager {
     public void testGetContactsById() { 
         // Search for the one contact id that should definitely be in memory.
         Set<Contact> contactListFound = contactManager.getContacts(CONTACT_ID_PAST);
-        
+
         // Ensure null was not returned
         assertNotNull(contactListFound);
-        
+
         // Check if we have got one result only as expected
         assertTrue(contactListFound.size() == 1);
-        
+
         // Retrieve the contact info to check if it matches to the result we expect
         Contact contactFound = contactListFound.iterator().next();
         assertTrue(contactFound.getId() == CONTACT_ID_PAST);
@@ -487,7 +488,7 @@ public class TestContactManager {
 
         verifyDefaultContactList(contactListFound);
     }
-    
+
     /** 
      * Check if exception is thrown on an id that does not correspond to a real contact. 
      */ 
@@ -497,16 +498,35 @@ public class TestContactManager {
         // is expected an exception.
         contactManager.getContacts(CONTACT_ID_NOT_REAL);
     }
-    
+
     /** 
      * Check if expected list of contacts is returned from the given name string.
      */ 
     @Test
     public void testGetContactsByName() { 
         Set<Contact> foundContactList = contactManager.getContacts(CONTACT_NAME_MULTIPLE_SEARCH_RESULT);
-        assertEquals(multipleContactList,foundContactList);
+
+        // Check if same size.
+        assertTrue(multipleContactList.size() == foundContactList.size());
+
+        // Assert each element exist inside the other
+        Iterator<Contact> i = multipleContactList.iterator();
+
+        // Go over all that is expected and match to what was found.
+        while(i.hasNext()) {
+            Contact c = i.next();
+            Set<Contact> found = foundContactList.stream()
+                    .filter(contact -> contact.getId() == c.getId())
+                    .collect(Collectors.toSet());
+
+            // There should be only one record found.
+            assertTrue(found.size() == 1);
+
+            // Check if is a match.
+            verify(c,found.iterator().next());
+        }
     }
-    
+
     /** 
      * Check if the one and only contact is returned from the given name string.
      */ 
@@ -527,7 +547,7 @@ public class TestContactManager {
         // Check if the name requested matches the name of the contact found.
         assertEquals(CONTACT_NAME_SINGLE_SEARCH_RESULT,contactFound.getName());
     }
-    
+
     /** 
      * Check if exception is thrown on a null parameter.
      * @throws NullPointerException if the parameter is null 
@@ -633,7 +653,7 @@ public class TestContactManager {
 
         // Ensure given meeting is not null.
         assertNotNull(pastMeetingFound);
-        
+
         // This is checking Meeting only
         assertEquals(MEETING_ID_PRESENT, pastMeetingFound.getId());
         // Verify all expected contacts are there.
@@ -1328,7 +1348,8 @@ public class TestContactManager {
         jArray.add(jUtils.toJSONObject(presentContact));
         jArray.add(jUtils.toJSONObject(futureContact));
         contactList.stream().forEach(contact -> jArray.add(jUtils.toJSONObject(contact)));
-        multipleContactList.stream().forEach(contact -> jArray.add(jUtils.toJSONObject(contact)));
+        jArray.add(jUtils.toJSONObject(new ContactImpl(CONTACT_ID_MULTIPLE_SEARCH_RESULT, 
+                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, CONTACT_NOTES_MULTIPLE)));
         return jArray;
     }
 
@@ -1380,16 +1401,19 @@ public class TestContactManager {
         contactList.add(new ContactImpl(CONTACT_ID_SINGLE_SEARCH_RESULT, 
                 CONTACT_NAME_SINGLE_SEARCH_RESULT, CONTACT_NOTES_SINGLE));
 
-        // The multiple list search result expected.
-        multipleContactList.add(new ContactImpl(CONTACT_ID_MULTIPLE_SEARCH_RESULT, 
-                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, CONTACT_NOTES_MULTIPLE));
-
         // Initialise past, present and future contact.
         pastContact         = new ContactImpl(CONTACT_ID_PAST, CONTACT_NAME_PAST, CONTACT_NOTES_PAST);
         presentContact      = new ContactImpl(CONTACT_ID_PRESENT, CONTACT_NAME_PRESENT, CONTACT_NOTES_PRESENT);
         futureContact       = new ContactImpl(CONTACT_ID_FUTURE, CONTACT_NAME_FUTURE, CONTACT_NOTES_FUTURE);
         notInMeetingContact = new ContactImpl(CONTACT_ID_NOT_IN_MEETING, CONTACT_NAME_NOT_IN_MEETING, CONTACT_NOTES_NOT_IN_MEETING);
         bogusContact        = new ContactImpl(CONTACT_ID_NOT_REAL, CONTACT_NAME_NOT_REAL, CONTACT_NOTES_NOT_REAL);
+
+        // The multiple list search result expected.
+        multipleContactList.add(futureContact);
+        multipleContactList.add(pastContact);
+        multipleContactList.add(presentContact);
+        multipleContactList.add(new ContactImpl(CONTACT_ID_MULTIPLE_SEARCH_RESULT, 
+                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, CONTACT_NOTES_MULTIPLE));
 
         // The past contact list.
         pastContactList.add(pastContact);
