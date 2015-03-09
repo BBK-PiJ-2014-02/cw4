@@ -227,6 +227,10 @@ public class ContactManagerImpl implements ContactManager {
                 result.add(c);
             }
         }
+
+        // If no result is found, must throw exception as per interface
+        if (result.size() == 0) throw new IllegalArgumentException();
+
         return result;
     }
 
