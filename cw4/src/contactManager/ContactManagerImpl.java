@@ -206,6 +206,7 @@ public class ContactManagerImpl implements ContactManager {
     @Override
     public void addNewContact(String name, String notes) {
         if ( notes == null ) throw new NullPointerException();
+        if ( name == null ) throw new NullPointerException();
         Contact contact = new ContactImpl(this.contactId+1, name, notes);
         this.contactId++;
         contactList.add(contact);
