@@ -198,7 +198,13 @@ public class ContactManagerImpl implements ContactManager {
      * {@inheritDoc}
      */
     @Override
-    public void addMeetingNotes(int id, String text) {}
+    public void addMeetingNotes(int id, String text) {
+        // Throw exception if notes are null
+        if ( text == null ) throw new NullPointerException();
+
+        // Meeting id must be inside the incremental range.
+        if ( id > meetingId ) throw new IllegalArgumentException();
+    }
 
     /**
      * {@inheritDoc}
@@ -241,7 +247,7 @@ public class ContactManagerImpl implements ContactManager {
     public Set<Contact> getContacts(String name) {
         if ( name == null ) throw new NullPointerException();
         return contactList.stream()
-                .filter(contact -> contact.getName().equals(name))
+                .filter(contact -> contact.getName().contains(name))
                 .collect(Collectors.toSet());
     }
 
