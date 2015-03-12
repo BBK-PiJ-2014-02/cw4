@@ -202,8 +202,10 @@ public class ContactManagerImpl implements ContactManager {
         // Throw exception if notes are null
         if ( text == null ) throw new NullPointerException();
 
-        // Meeting id must be inside the incremental range.
-        if ( id > meetingId ) throw new IllegalArgumentException();
+        Meeting foundMeeting = getMeeting(id);
+
+        // Meeting must exist.
+        if ( foundMeeting == null ) throw new IllegalArgumentException();
     }
 
     /**
@@ -333,6 +335,7 @@ public class ContactManagerImpl implements ContactManager {
                            for( int i = 0; i < joArray.size(); i++ ) {
                                element = (JSONObject) joArray.get(i);
                                contactList.add(jUtils.toContact(element));
+                               contactId++;
                            }
                            break;
                         }
@@ -342,6 +345,7 @@ public class ContactManagerImpl implements ContactManager {
                             for( int i = 0; i < joArray.size(); i++ ) {
                                 element = (JSONObject) joArray.get(i);
                                 meetingList.add(jUtils.toMeeting(element));
+                                meetingId++;
                             }
                             break;
                         }
