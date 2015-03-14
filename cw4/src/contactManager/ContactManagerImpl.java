@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -211,7 +213,37 @@ public class ContactManagerImpl implements ContactManager {
      */
     @Override
     public List<PastMeeting> getPastMeetingList(Contact contact) {
-        return null;
+        // If not contact given, return empty list.
+        if ( contact == null ) return new LinkedList<PastMeeting>();
+
+        // The final returning List object
+        List<PastMeeting> finalMeetingList = new LinkedList<PastMeeting>();
+
+        // Go over each meeting and check if the above contact exists in it.
+        for(Meeting meeting : meetingList ) {
+            // If this is not a PastMeeting, skip to next.
+            if ( !meeting.getClass().getSimpleName().equals(PastMeetingImpl.class.getSimpleName())) continue;
+
+            // Check if we have the expected contact in this meeting
+            Set<Contact> contactList = meeting.getContacts();
+            if ( contactList.stream().filter(c -> c.getId() == contact.getId()).count() > 0 ) {
+                // Found the contact id in the list of contacts for this meeting, add it to the final list.
+                finalMeetingList.add((PastMeeting)meeting);
+            }
+        }
+
+        Collections.sort(finalMeetingList, new PastMeetingComparator());
+
+        return finalMeetingList;
+    }
+
+    class PastMeetingComparator implements Comparator<PastMeeting> {
+        @Override
+        public int compare(PastMeeting o1, PastMeeting o2) {
+            if ( o1.getId() < o2.getId() ) return 1;
+            if ( o1.getId() > o2.getId() ) return -1;
+            return 0;
+        }
     }
 
     /**
