@@ -48,6 +48,11 @@ public class JSONUtilsImpl implements JSONUtils {
         // If meeting is null, keep integrity by returning and empty JSON Object.
         if ( meeting == null ) return jo;
 
+        // Get the Interface name for this class. 
+        // E.g.: FutureMeeting, PastMeeting, Meeting,
+        // and pass this on to the JSONObject.
+        String classSimpleName = meeting.getClass().getInterfaces()[0].getSimpleName();
+        jo.put("type", classSimpleName);
         jo.put("id", meeting.getId());
         jo.put("date", toJSONObject(meeting.getDate()));
 
@@ -86,6 +91,9 @@ public class JSONUtilsImpl implements JSONUtils {
         // If jObject is null, return null
         if ( jObject == null ) return null;
 
+        // Read the meeting Interface to be had
+        String meetingInterface = jObject.get("type").toString();
+
         // Read the meeting id
         Integer id      = Integer.valueOf(jObject.get("id").toString());
 
@@ -103,15 +111,46 @@ public class JSONUtilsImpl implements JSONUtils {
             contacts.add(c);
         }
 
-        // Create the Meeting object to be returned.
-        Meeting meeting = null;
-        try {
-            meeting = new MeetingImpl(id,date,contacts);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        switch (meetingInterface) {
+            case "Meeting" : {
+                // Create the Meeting object to be returned.
+                Meeting meeting = null;
+                try {
+                    meeting = new MeetingImpl(id,date,contacts);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-        return meeting;
+                return meeting;
+            }
+            case "PastMeeting" : {
+                // Create the Meeting object to be returned.
+                PastMeeting meeting = null;
+                try {
+                    String notes = (String) jObject.get("notes");
+                    meeting = new PastMeetingImpl(id,date,contacts,notes);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                return meeting;
+            }
+            case "FutureMeeting" : {
+                // Create the Meeting object to be returned.
+                FutureMeeting meeting = null;
+                try {
+                    meeting = new FutureMeetingImpl(id,date,contacts);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                return meeting;
+            }
+
+            default : {
+                throw new IllegalArgumentException();
+            }
+        }
     }
 
     /**
