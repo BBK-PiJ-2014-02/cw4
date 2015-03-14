@@ -992,7 +992,7 @@ public class TestContactManager {
      */ 
     @Test
     public void testGetFutureMeetingIdNonExisting() {
-        FutureMeeting futureMeetingFound = contactManager.getFutureMeeting(CONTACT_ID_NOT_REAL);
+        FutureMeeting futureMeetingFound = contactManager.getFutureMeeting(MEETING_NOT_EXISTING_ID);
 
         // The id was not real, expecting a null.
         assertNull(futureMeetingFound);
