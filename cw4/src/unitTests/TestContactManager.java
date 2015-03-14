@@ -1136,27 +1136,32 @@ public class TestContactManager {
      */ 
     @Test
     public void testGetFutureMeetingListByDate() { 
-       List<Meeting> foundMeetingsList = contactManager.getFutureMeetingList(DATE_FUTURE);
+        // Create a new future date
+        Calendar newFutureDate = Calendar.getInstance();
+        newFutureDate.add(Calendar.HOUR_OF_DAY, 1);
 
-       // Check not null
-       assertNotNull(foundMeetingsList);
+        List<Meeting> foundMeetingsList = contactManager.getFutureMeetingList(newFutureDate);
 
-       // Check we have one record at least
-       assertTrue(foundMeetingsList.size() > 0);
+        // Check not null
+        assertNotNull(foundMeetingsList);
 
-       // One failed date to fail the test.
-       Boolean allInDate = true;
+        // It is expected to have one record at least
+        assertTrue(foundMeetingsList.size() > 0);
 
-       // Check they are all on the given data
-       for( Meeting meeting : foundMeetingsList ) {
-          if (! meeting.getDate().equals(DATE_FUTURE) )  {
-             allInDate = false;
-             continue;
-          }
-       }
+        // Only need one failed date to fail the test.
+        Boolean allInDate = true;
 
-       // Final check
-       assertTrue(allInDate);
+        // Check they are all on the given data
+        for( Meeting meeting : foundMeetingsList ) {
+            // If one fails, no need to check more.
+            if (! meeting.getDate().after(newFutureDate) )  {
+                allInDate = false;
+                break;
+            }
+        }
+
+        // Final check
+        assertTrue(allInDate);
 
     }
 
