@@ -216,7 +216,24 @@ public class ContactManagerImpl implements ContactManager {
      */
     @Override
     public List<Meeting> getFutureMeetingList(Contact contact) {
-        return null;
+        // If no contact given, return an empty list
+        if ( contact == null ) return new LinkedList<Meeting>();
+
+        // Final FutureMeeting list to be returned
+        List<Meeting> finalFutureMeetingList = new LinkedList<Meeting>();
+
+        for(Meeting meeting : meetingList ) {
+            // Only interested in the FutureMeeting types.
+            if ( meeting.getClass().getSimpleName().equals(FutureMeetingImpl.class.getSimpleName())) {
+                Set<Contact> contacts = meeting.getContacts();
+                // Check if this meeting has this contact in.
+                Long numberOfContactsFound = contacts.stream().filter(c -> c.getId() == contact.getId() ).count();
+                  if ( numberOfContactsFound == 1 ) finalFutureMeetingList.add(meeting);
+            }
+        }
+
+        // TODO: Return a sorted list by date
+        return finalFutureMeetingList;
     }
 
     /**
@@ -259,6 +276,7 @@ public class ContactManagerImpl implements ContactManager {
         return finalMeetingList;
     }
 
+    // TODO: Get this into a new class file.
     class PastMeetingComparator implements Comparator<PastMeeting> {
         @Override
         public int compare(PastMeeting o1, PastMeeting o2) {
