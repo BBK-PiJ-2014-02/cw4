@@ -1,10 +1,6 @@
 package unitTests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,7 +9,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -324,6 +319,11 @@ public class TestContactManager {
     private final int MEETING_ID_FUTURE = 4;
 
     /**
+     * Future Meeting id with past date.
+     */
+    private final int MEETING_ID_FUTURE_PAST_DATE = 5;
+
+    /**
      * Future Meeting notes.
      */
     private final String MEETING_NOTES_FUTURE = "Future meeting notes";
@@ -362,6 +362,11 @@ public class TestContactManager {
      */
     private Meeting futureMeeting;
     
+    /**
+     * The Future Meeting testing object handler with a past date.
+     */
+    private Meeting futureMeetingPastDate;
+
     /**
      * The ContactManager testing object handler.
      */
@@ -486,7 +491,7 @@ public class TestContactManager {
         Set<Contact> contactListFound = contactManager.getContacts(CONTACT_ID_PAST,
                 CONTACT_ID_SINGLE_SEARCH_RESULT,CONTACT_ID_MULTIPLE_SEARCH_RESULT);
 
-        verifyDefaultContactList(contactListFound);
+        verifyContactLists(contactList,contactListFound);
     }
 
     /** 
@@ -605,8 +610,9 @@ public class TestContactManager {
      */ 
     @Test
     public void testAddMeetingNotesFutureToPastMeeting() { 
-        contactManager.addMeetingNotes(MEETING_ID_FUTURE, MEETING_NOTES_PRESENT);
-        Meeting meetingFound = contactManager.getMeeting(MEETING_ID_FUTURE);
+        // Need to test with a FutureMeeting with a date set in the past
+        contactManager.addMeetingNotes(MEETING_ID_FUTURE_PAST_DATE, MEETING_NOTES_PRESENT);
+        Meeting meetingFound = contactManager.getMeeting(MEETING_ID_FUTURE_PAST_DATE);
         assertNotNull(meetingFound);
         assertEquals(PastMeetingImpl.class,meetingFound.getClass());
     }
@@ -616,8 +622,8 @@ public class TestContactManager {
      */ 
     @Test
     public void testAddMeetingNotesReturnPastMeetingWithNotes() { 
-        contactManager.addMeetingNotes(MEETING_ID_FUTURE, MEETING_NOTES_PRESENT);
-        PastMeeting meetingFound = contactManager.getPastMeeting(MEETING_ID_FUTURE);
+        contactManager.addMeetingNotes(MEETING_ID_FUTURE_PAST_DATE, MEETING_NOTES_PRESENT);
+        PastMeeting meetingFound = contactManager.getPastMeeting(MEETING_ID_FUTURE_PAST_DATE);
         assertNotNull(meetingFound);
         assertEquals(MEETING_NOTES_PRESENT, meetingFound.getNotes());
     }
@@ -655,11 +661,11 @@ public class TestContactManager {
         assertNotNull(pastMeetingFound);
 
         // This is checking Meeting only
-        assertEquals(MEETING_ID_PRESENT, pastMeetingFound.getId());
+        assertEquals(MEETING_ID_PAST, pastMeetingFound.getId());
         // Verify all expected contacts are there.
-        verifyDefaultContactList(pastMeetingFound.getContacts());
+        verifyContactLists(pastMeeting.getContacts(),pastMeetingFound.getContacts());
         // Check the date of the meeting if matches the default expected.
-        assertEquals(DATE_PRESENT, pastMeetingFound.getDate());
+        verify(DATE_PAST, pastMeetingFound.getDate());
     }
     
     /**
@@ -1365,6 +1371,7 @@ public class TestContactManager {
         jMeetings.add(jUtils.toJSONObject(pastMeeting));
         jMeetings.add(jUtils.toJSONObject(presentMeeting));
         jMeetings.add(jUtils.toJSONObject(futureMeeting));
+        jMeetings.add(jUtils.toJSONObject(futureMeetingPastDate));
         return jMeetings;
     }
 
@@ -1373,9 +1380,10 @@ public class TestContactManager {
      */
     private void defaultMeetingInit() {
         try {
-            pastMeeting    = new PastMeetingImpl(MEETING_ID_PAST,DATE_PAST,pastContactList,MEETING_NOTES_PAST);
-            presentMeeting = new MeetingImpl(MEETING_ID_PRESENT,DATE_PRESENT,presentContactList);
-            futureMeeting  = new FutureMeetingImpl(MEETING_ID_FUTURE,DATE_FUTURE,futureContactList);
+            pastMeeting           = new PastMeetingImpl(MEETING_ID_PAST,DATE_PAST,pastContactList,MEETING_NOTES_PAST);
+            presentMeeting        = new MeetingImpl(MEETING_ID_PRESENT,DATE_PRESENT,presentContactList);
+            futureMeeting         = new FutureMeetingImpl(MEETING_ID_FUTURE,DATE_FUTURE,futureContactList);
+            futureMeetingPastDate = new FutureMeetingImpl(MEETING_ID_FUTURE_PAST_DATE,DATE_PAST,futureContactList);
         } catch (Exception e) {
             // Keep calm and carry on.
         }
@@ -1385,12 +1393,11 @@ public class TestContactManager {
      * Initialise all Calendar dates with the default values.
      */
     private void defaultCalendarInit() {
-        DATE_FUTURE = new GregorianCalendar();
-        DATE_FUTURE.set(Calendar.YEAR+1, Calendar.MONTH, Calendar.DATE, Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND);
-        DATE_PAST = new GregorianCalendar();
-        DATE_PAST.set(Calendar.YEAR-1, Calendar.MONTH, Calendar.DATE, Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND);
-        DATE_PRESENT = new GregorianCalendar();
-        DATE_PRESENT.set(Calendar.YEAR, Calendar.MONTH, Calendar.DATE, Calendar.HOUR_OF_DAY, Calendar.MINUTE, Calendar.SECOND);
+        DATE_FUTURE = Calendar.getInstance();
+        DATE_FUTURE.add(Calendar.DAY_OF_MONTH, 1);
+        DATE_PAST = Calendar.getInstance();
+        DATE_PAST.add(Calendar.DAY_OF_MONTH, -1);
+        DATE_PRESENT = Calendar.getInstance();
     }
     
     /**
@@ -1398,8 +1405,12 @@ public class TestContactManager {
      */
     private void defaultContactInit() {
         // Adding all contacts existing to the contactList to be acted upon.
+        contactList.add(new ContactImpl(CONTACT_ID_PAST, CONTACT_NAME_PAST, 
+                CONTACT_NOTES_PAST));
         contactList.add(new ContactImpl(CONTACT_ID_SINGLE_SEARCH_RESULT, 
                 CONTACT_NAME_SINGLE_SEARCH_RESULT, CONTACT_NOTES_SINGLE));
+        contactList.add(new ContactImpl(CONTACT_ID_MULTIPLE_SEARCH_RESULT, 
+                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, CONTACT_NOTES_MULTIPLE));
 
         // Initialise past, present and future contact.
         pastContact         = new ContactImpl(CONTACT_ID_PAST, CONTACT_NAME_PAST, CONTACT_NOTES_PAST);
@@ -1428,48 +1439,32 @@ public class TestContactManager {
     }
 
     /**
-     * Given a set list of contacts, check if all the default ones are inside only once.
+     * Given a set list of contacts, check if all expected contacts match found.
      * 
      * @param contactListFound the Set of Contacts found.
      */
-    private void verifyDefaultContactList(Set<Contact> contactListFound) {
+    private void verifyContactLists(Set<Contact> contactListExpected, Set<Contact> contactListFound) {
         // Ensure we have got something returned
         assertNotNull(contactListFound);
-        
-        // Check if we have three contacts only as expected
-        assertTrue(contactListFound.size() == 3);
 
-        // Expected three records to be correctly matched.
+        // Check if we have same sized lists
+        assertEquals(contactListExpected.size(),contactListFound.size());
+
+        // Expected all records to be correctly matched.
         int foundCorrect = 0;
 
-        // Check details as per the contact id returned of each one of them
-        for(int i = 0; i < contactListFound.size(); i++ ) {
-            Contact contactFound = contactListFound.iterator().next();
-            if ( contactFound.getId() == CONTACT_ID_PAST ) {
-                assertTrue(contactFound.getId() == CONTACT_ID_PAST);
-                assertEquals(contactFound.getName(),CONTACT_NAME_PAST);
-                assertEquals(contactFound.getNotes(),CONTACT_NOTES_PAST);
-                foundCorrect++;
-            }
-            else if ( contactFound.getId() == CONTACT_ID_MULTIPLE_SEARCH_RESULT ) {
-                assertTrue(contactFound.getId() == CONTACT_ID_MULTIPLE_SEARCH_RESULT);
-                assertEquals(contactFound.getName(),CONTACT_NAME_MULTIPLE_SEARCH_RESULT);
-                assertEquals(contactFound.getNotes(),CONTACT_NOTES_MULTIPLE);
-                foundCorrect++;
-            }
-            else if ( contactFound.getId() == CONTACT_ID_SINGLE_SEARCH_RESULT ){
-                assertTrue(contactFound.getId() == CONTACT_ID_SINGLE_SEARCH_RESULT);
-                assertEquals(contactFound.getName(),CONTACT_NAME_SINGLE_SEARCH_RESULT);
-                assertEquals(contactFound.getNotes(),CONTACT_NOTES_SINGLE);
-                foundCorrect++;
-            }
-            else {
-                foundCorrect--;
+        // Check details for each contact in list and check if match.
+        for(Contact contactExpected : contactListExpected) {
+            for( Contact contactFound : contactListFound ) {
+                if ( contactExpected.getId() == contactFound.getId() ) {
+                    verify(contactExpected, contactFound);
+                    foundCorrect++;
+                }
             }
         }
         
         // re-ensure we have got all three correct.
-        assertTrue(foundCorrect == 3);
+        assertEquals(contactListExpected.size(), foundCorrect);
     }
  
     /**
