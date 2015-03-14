@@ -1020,13 +1020,13 @@ public class TestContactManager {
         // Check we have got at least one
         assertTrue(futureMeetingsFound.size() > 0);
 
-        // Make sure we have got ast least one future meeting and no other.
+        // Make sure we have got at least one future meeting and no other.
         Boolean gotFutureMeeting = false;
         Boolean gotOtherMeetings = false;
 
         // Check that we have the expected future meeting
         for( Meeting meetingFound : futureMeetingsFound ) {
-            if ( meetingFound.equals(futureMeeting) ) {
+            if ( meetingFound.getClass().getSimpleName().equals(FutureMeetingImpl.class.getSimpleName()) ) {
                 gotFutureMeeting = true;
             } else {
                 gotOtherMeetings = true;
