@@ -138,7 +138,34 @@ public class ContactManagerImpl implements ContactManager {
      */
     @Override
     public PastMeeting getPastMeeting(int id) {
-        return null;
+        // Get the meeting
+        Meeting meeting = getMeeting(id);
+
+        // If null, there was not meeting with that id.
+        if ( meeting == null ) return null;
+
+        // Get date
+        Calendar meetingDate = meeting.getDate();
+
+        // Check if date is in the future
+        if ( meetingDate.after(Calendar.getInstance()) ) throw new IllegalArgumentException();
+
+        // Get contacts
+        Set<Contact> meetingContacts = meeting.getContacts();
+
+        // meetingNotes if we are dealing with a PastMeeting
+        String meetingNotes = "";
+
+        // Check if we have a PastMeeting and pick existing notes if so.
+        if ( meeting.getClass().getSimpleName().equals(PastMeetingImpl.class.getSimpleName())) {
+            PastMeeting pastMeeting = (PastMeeting) getMeeting(id);
+            meetingNotes = pastMeeting.getNotes();
+        }
+
+        // Create a PastMeeting
+        PastMeeting pastMeeting = new PastMeetingImpl(id, meetingDate, meetingContacts, meetingNotes);
+
+        return pastMeeting;
     }
 
     /**
@@ -158,7 +185,7 @@ public class ContactManagerImpl implements ContactManager {
         for( Meeting meetingFound : meetingList ) {
             if ( meetingFound.getId() == id ) return meetingFound;
         }
-        System.out.println("meetinglist: "+meetingList.toString());
+
         // If all the above fails, return null.
         return null;
     }
@@ -202,10 +229,28 @@ public class ContactManagerImpl implements ContactManager {
         // Throw exception if notes are null
         if ( text == null ) throw new NullPointerException();
 
-        Meeting foundMeeting = getMeeting(id);
+        // Get the respective meeting object for the given meeting id
+        Meeting meeting = getMeeting(id);
 
-        // Meeting must exist.
-        if ( foundMeeting == null ) throw new IllegalArgumentException();
+        // Meeting must exist or throw exception.
+        if ( meeting == null ) throw new IllegalArgumentException();
+
+        // Get the meeting's date.
+        Calendar meetingDate = meeting.getDate();
+
+        // Not allowed to add notes to a meeting set in the future.
+        if ( meetingDate.after(Calendar.getInstance())) throw new IllegalStateException();
+
+        // Get the contacts
+        Set<Contact> meetingContacts = meeting.getContacts();
+
+        // Create the new PastMeeting with the notes
+        PastMeeting newPastMeeting = new PastMeetingImpl(id, meetingDate, meetingContacts, text);
+
+        // When adding notes to a meeting, it becomes a PastMeeting.
+        // Remove old meeting and add the new PastMeeting.
+        meetingList.remove(meeting);
+        meetingList.add(newPastMeeting);
     }
 
     /**
@@ -286,6 +331,34 @@ public class ContactManagerImpl implements ContactManager {
     }
 
     /**
+     * Checks if a contact Id has already been added to the contact list
+     */
+    private boolean hasContact(int contactId) {
+        if ( contactId == 0 ) return false;
+
+        Long hasContact = contactList.stream()
+                .filter(contact->contact.getId()==contactId).count();
+
+        if ( hasContact > 0 ) return true;
+
+        return false;
+    }
+
+    /**
+     * Checks if a meeting Id has already been added to the meeting list
+     */
+    private boolean hasMeeting(int meetingId) {
+        if ( meetingId == 0 ) return false;
+
+        Long hasMeeting = meetingList.stream()
+                .filter(meeting->meeting.getId() == meetingId).count();
+
+        if ( hasMeeting > 0 ) return true;
+
+        return false;
+    }
+
+    /**
      * Loads all data from the file into memory.
      * 
      * If the file does not exists, creates one.
@@ -334,8 +407,12 @@ public class ContactManagerImpl implements ContactManager {
                            // Loop through all elements and load them into the contactList.
                            for( int i = 0; i < joArray.size(); i++ ) {
                                element = (JSONObject) joArray.get(i);
-                               contactList.add(jUtils.toContact(element));
-                               contactId++;
+                               // Do not add multiple contacts of the same id
+                               Contact c = jUtils.toContact(element);
+                               if( !hasContact(c.getId()) ) {
+                                   contactList.add(jUtils.toContact(element));
+                                   contactId++;
+                               }
                            }
                            break;
                         }
@@ -344,8 +421,11 @@ public class ContactManagerImpl implements ContactManager {
                             // Loop through all elements and load them into the meetingList.
                             for( int i = 0; i < joArray.size(); i++ ) {
                                 element = (JSONObject) joArray.get(i);
-                                meetingList.add(jUtils.toMeeting(element));
-                                meetingId++;
+                                Meeting m = jUtils.toMeeting(element);
+                                if( !hasMeeting(m.getId()) ) {
+                                    meetingList.add(jUtils.toMeeting(element));
+                                    meetingId++;
+                                }
                             }
                             break;
                         }
