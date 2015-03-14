@@ -132,6 +132,12 @@ public class ContactManagerImpl implements ContactManager {
      */
     @Override
     public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
+        // Throw exception if any of the given contacts it not known.
+        for(Contact contact : contacts ) {
+            // If we do not have one contact for each of the given contacts, throw exception
+            Long contactFound = contactList.stream().filter(c -> c.getId() == contact.getId() ).count(); 
+            if ( !(contactFound == 1) ) throw new IllegalArgumentException();
+        }
         return 0;
     }
 
@@ -182,6 +188,10 @@ public class ContactManagerImpl implements ContactManager {
         if ( meeting == null ) return null;
 
         Calendar date = meeting.getDate();
+
+        // Check date is not in the past, or thorw exception.
+        if ( date.before(Calendar.getInstance()) ) throw new IllegalArgumentException();
+
         Set<Contact> contacts = meeting.getContacts();
         FutureMeeting futureMeeting = new FutureMeetingImpl(id, date, contacts);
         return futureMeeting;
