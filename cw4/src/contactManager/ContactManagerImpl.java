@@ -263,10 +263,8 @@ public class ContactManagerImpl implements ContactManager {
         if ( date == null ) return finalMeetingList;
 
         for( Meeting meeting : meetingList ) {
-            // Check if meeting is in the future up to one second from now
-            if ( meeting.getDate().after(Calendar.getInstance()) ) {
-                finalMeetingList.add(meeting);
-            }
+            // Check if meeting is set after given date
+            if ( meeting.getDate().after(date) ) finalMeetingList.add(meeting);
         }
 
         // Get the list sorted by date.
@@ -322,6 +320,14 @@ public class ContactManagerImpl implements ContactManager {
      */
     @Override
     public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) { 
+        // Create a new past meeting
+        PastMeeting pastMeeting = new PastMeetingImpl(contactId, date, contacts, text);
+
+        // Increment the internal contact id count.
+        contactId++;
+
+        // Add the new meeting in
+        meetingList.add(pastMeeting);
     }
 
     /**
@@ -406,6 +412,7 @@ public class ContactManagerImpl implements ContactManager {
      */
     @Override
     public void flush() {
+        meetingList.stream().forEach(m->System.out.println(m.getId()+", "+m.getDate().getTime()));
         try {
             saveData();
         } catch (IOException e) {
