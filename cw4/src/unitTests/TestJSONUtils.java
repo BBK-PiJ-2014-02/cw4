@@ -16,10 +16,12 @@ import org.junit.Test;
 
 import contactManager.Contact;
 import contactManager.ContactImpl;
+import contactManager.FutureMeeting;
 import contactManager.JSONUtils;
 import contactManager.JSONUtilsImpl;
 import contactManager.Meeting;
 import contactManager.MeetingImpl;
+import contactManager.PastMeeting;
 
 public class TestJSONUtils {
     /**
@@ -43,6 +45,16 @@ public class TestJSONUtils {
     private Meeting meeting;
 
     /**
+     * PastMeeting to convert to JSONObject.
+     */
+    private PastMeeting pastMeeting;
+
+    /**
+     * FutureMeeting to convert to JSONObject.
+     */
+    private FutureMeeting futureMeeting;
+
+    /**
      * The JSONObject with the date information.
      */
     private JSONObject jDate;
@@ -56,6 +68,16 @@ public class TestJSONUtils {
      * The JSONObject with the meeting information.
      */
     private JSONObject jMeeting;
+
+    /**
+     * The JSONObject with the past meeting information.
+     */
+    private JSONObject jPastMeeting;
+
+    /**
+     * The JSONObject with the future meeting information.
+     */
+    private JSONObject jFutureMeeting;
 
     /**
      * Calendar Year.
@@ -108,6 +130,16 @@ public class TestJSONUtils {
     private final Integer MEETING_ID = 122;
 
     /**
+     * The past meeting id.
+     */
+    private final Integer MEETING_ID_PAST = 12;
+
+    /**
+     * The future meeting id.
+     */
+    private final Integer MEETING_ID_FUTURE = 1222;
+
+    /**
      * The meeting contacts.
      */
     private Set<Contact> MEETING_CONTACTS;
@@ -152,8 +184,9 @@ public class TestJSONUtils {
         jContact.put("name", CONTACT_NAME);
         jContact.put("notes", CONTACT_NOTES);
                 
-        // Set the structure for the JSONObject type contact
+        // Set the structure for the JSONObject type Meeting
         jMeeting = new JSONObject();
+        jMeeting.put("type", "Meeting");
         jMeeting.put("id", MEETING_ID);
         jMeeting.put("date", jDate);
 
@@ -161,6 +194,22 @@ public class TestJSONUtils {
                   jA.add(jContact);
 
         jMeeting.put("contacts", jA);
+
+        // Set the structure for the JSONObject type PastMeeting
+        jPastMeeting = new JSONObject();
+        jPastMeeting.put("type", "PastMeeting");
+        jPastMeeting.put("id", MEETING_ID);
+        jPastMeeting.put("date", jDate);
+
+        jPastMeeting.put("contacts", jA);
+
+        // Set the structure for the JSONObject type FutureMeeting
+        jFutureMeeting = new JSONObject();
+        jFutureMeeting.put("type", "FutureMeeting");
+        jFutureMeeting.put("id", MEETING_ID);
+        jFutureMeeting.put("date", jDate);
+
+        jFutureMeeting.put("contacts", jA);
 
         // Initialise the JSONUtils class object.
         jUtils = new JSONUtilsImpl();
