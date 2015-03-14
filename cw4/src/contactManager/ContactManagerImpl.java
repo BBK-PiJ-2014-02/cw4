@@ -232,8 +232,20 @@ public class ContactManagerImpl implements ContactManager {
             }
         }
 
-        // TODO: Return a sorted list by date
+        // Sort the list.
+        Collections.sort(finalFutureMeetingList, new MeetingComparator());
+
         return finalFutureMeetingList;
+    }
+
+    // TODO: Get this into a new class file.
+    class MeetingComparator implements Comparator<Meeting> {
+        @Override
+        public int compare(Meeting o1, Meeting o2) {
+            if ( o1.getDate().after(o2.getDate()) ) return 1;
+            if ( o1.getDate().before(o2.getDate()) ) return -1;
+            return 0;
+        }
     }
 
     /**
