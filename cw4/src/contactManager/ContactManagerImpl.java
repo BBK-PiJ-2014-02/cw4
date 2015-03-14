@@ -175,7 +175,16 @@ public class ContactManagerImpl implements ContactManager {
      */
     @Override
     public FutureMeeting getFutureMeeting(int id) {
-        return null;
+        // Get the meeting with the respective given id.
+        Meeting meeting = getMeeting(id);
+
+        // No meeting found, return null.
+        if ( meeting == null ) return null;
+
+        Calendar date = meeting.getDate();
+        Set<Contact> contacts = meeting.getContacts();
+        FutureMeeting futureMeeting = new FutureMeetingImpl(id, date, contacts);
+        return futureMeeting;
     }
 
     /**
@@ -213,8 +222,11 @@ public class ContactManagerImpl implements ContactManager {
      */
     @Override
     public List<PastMeeting> getPastMeetingList(Contact contact) {
-        // If not contact given, return empty list.
+        // If no contact given, return empty list.
         if ( contact == null ) return new LinkedList<PastMeeting>();
+
+        // If contact does not exist, throw exception
+        if ( contactList.stream().filter(c -> c.getId() == contact.getId()).count() == 0 ) throw new IllegalArgumentException();
 
         // The final returning List object
         List<PastMeeting> finalMeetingList = new LinkedList<PastMeeting>();
