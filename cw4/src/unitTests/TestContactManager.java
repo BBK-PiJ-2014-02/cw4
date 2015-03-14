@@ -1170,13 +1170,17 @@ public class TestContactManager {
      */ 
     @Test
     public void testGetFutureMeetingListByDateSorted() { 
-        List<Meeting> futureMeetingsList = contactManager.getFutureMeetingList(DATE_FUTURE);
+        // Create a new future date
+        Calendar newFutureDate = Calendar.getInstance();
+        newFutureDate.add(Calendar.HOUR_OF_DAY, 1);
+
+        List<Meeting> futureMeetingsList = contactManager.getFutureMeetingList(newFutureDate);
 
         // Check if not null
         assertNotNull(futureMeetingsList);
 
-        // check at least two records
-        assertTrue(futureMeetingsList.size() > 1);
+        // Expect at least one record.
+        assertTrue(futureMeetingsList.size() > 0);
 
         // Save previous meeting for comparison
         Meeting previousMeeting = null;
@@ -1199,7 +1203,6 @@ public class TestContactManager {
 
         // Check if the returned list is still sorted.
         assertTrue(sorted);
-        
     }
 
     /** 
@@ -1207,24 +1210,29 @@ public class TestContactManager {
      */ 
     @Test
     public void testGetFutureMeetingListByDateNoDups() {
-        List<Meeting> futureMeetingListFound = contactManager.getFutureMeetingList(DATE_FUTURE);
+        // Create a new future date
+        Calendar newFutureDate = Calendar.getInstance();
+        newFutureDate.add(Calendar.HOUR_OF_DAY, 1);
+
+        List<Meeting> futureMeetingListFound = contactManager.getFutureMeetingList(newFutureDate);
 
         // check it is not null
         assertNotNull(futureMeetingListFound);
 
-        // check we have more than one record
-        assertTrue(futureMeetingListFound.size() > 1);
-
-        // Meetings already seen
-        List<Meeting> seenMeetings = new LinkedList<Meeting>();
+        // Expect at least one record
+        assertTrue(futureMeetingListFound.size() > 0);
 
         // Assume no dups, until told otherwise
         Boolean hasDups = false;
 
+        // Keep a list of all Meetings already seen
+        List<Meeting> seenMeetings = new LinkedList<Meeting>();
+
         for(Meeting meeting : futureMeetingListFound) {
+            // If same meeting is found in the already seen meetings, the test fails.
             if ( seenMeetings.contains(meeting) ) {
                 hasDups = true;
-                continue;
+                break;
             }
             else {
                 seenMeetings.add(meeting);
