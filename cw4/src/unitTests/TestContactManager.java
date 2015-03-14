@@ -272,12 +272,12 @@ public class TestContactManager {
     /**
      * The not used in meetings contact list.
      */
-    private Set<Contact> notInMeetingsList = new HashSet<Contact>();
+    private Set<Contact> notInMeetingsContactList = new HashSet<Contact>();
 
     /**
      * The bogs meeting list to test on contacts that do not exist.
      */
-    private Set<Contact> bogusMeetingsList = new HashSet<Contact>();
+    private Set<Contact> bogusContactList = new HashSet<Contact>();
 
     /**
      * The full contact list available.
@@ -509,26 +509,23 @@ public class TestContactManager {
      */ 
     @Test
     public void testGetContactsByName() { 
+        // Search for a contact name that should have multiple results
         Set<Contact> foundContactList = contactManager.getContacts(CONTACT_NAME_MULTIPLE_SEARCH_RESULT);
 
-        // Check if same size.
-        assertTrue(multipleContactList.size() == foundContactList.size());
-
-        // Assert each element exist inside the other
-        Iterator<Contact> i = multipleContactList.iterator();
+        // Check that the size is more than 1.
+        assertTrue(foundContactList.size() > 1);
 
         // Go over all that is expected and match to what was found.
-        while(i.hasNext()) {
-            Contact c = i.next();
-            Set<Contact> found = foundContactList.stream()
+        for( Contact c : multipleContactList ) {
+            List<Contact> found = foundContactList.stream()
                     .filter(contact -> contact.getId() == c.getId())
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
 
             // There should be only one record found.
             assertTrue(found.size() == 1);
 
-            // Check if is a match.
-            verify(c,found.iterator().next());
+            // Check if this contact is match.
+            verify(c,found.get(0));
         }
     }
 
@@ -552,7 +549,6 @@ public class TestContactManager {
         // Check if the name requested matches the name of the contact found.
         assertEquals(CONTACT_NAME_SINGLE_SEARCH_RESULT,contactFound.getName());
     }
-
     /** 
      * Check if exception is thrown on a null parameter.
      * @throws NullPointerException if the parameter is null 
@@ -721,7 +717,7 @@ public class TestContactManager {
     }
     
     /** 
-     * Test if list is returned empty on none found.
+     * Test if list is returned empty on none found for this contact.
      */ 
     @Test
     public void testGetPastMeetingListNoneFound() { 
@@ -747,8 +743,8 @@ public class TestContactManager {
         // Check that we do not have a null list.
         assertNotNull(pastMeetingList);
 
-        // Check that we have more than one element.
-        assertTrue(pastMeetingList.size() > 1);
+        // Expect at least one element.
+        assertTrue(pastMeetingList.size() > 0);
 
         // Keep a record of previous checked date
         Calendar previousDate = null;
@@ -787,9 +783,10 @@ public class TestContactManager {
         // Ensure we have one
         assertNotNull(pastMeetingFound);
 
+        // TODO:
         // Ensure it is not empty and more than one element is found.
         // This forces to revisit the test if only one element is produced.
-        assertTrue(pastMeetingFound.size() > 1);
+        assertTrue(pastMeetingFound.size() > 0);
 
         // Start with the right foot
         Boolean hasDuplicates = false;
@@ -824,8 +821,11 @@ public class TestContactManager {
      */ 
     @Test
     public void testAddNewPastMeeting() {
+        // Random singular notes to match when searching for this meeting back.
+        String newNotes = "Very specific notes about this new meeting to be found";
+
         // Add new Past Meeting
-        contactManager.addNewPastMeeting(notInMeetingsList, DATE_PAST, CONTACT_NOTES_PAST);
+        contactManager.addNewPastMeeting(notInMeetingsContactList, DATE_PAST, newNotes);
 
         // Retrieve meeting
         List<PastMeeting> pastMeetingListFound = contactManager.getPastMeetingList(notInMeetingContact);
@@ -833,22 +833,23 @@ public class TestContactManager {
         // Check if exists
         assertNotNull(pastMeetingListFound);
 
-        // Check if at least one record
-        assertTrue(pastMeetingListFound.size() > 0);
+        // Check we have only one record
+        assertTrue(pastMeetingListFound.size() == 1);
 
-        // Expect the worst
-        Boolean foundMeeting = false;
+        // The Meeting Found from searching
+        PastMeeting searchedFoundMeeting = null;
 
         // Scan through the meetings in search for that past date and contact notes.
-        for( PastMeeting pastMeeting : pastMeetingListFound) {
-            if ( pastMeeting.equals(notInMeetingContact) ) {
-                foundMeeting = true;
+        for( PastMeeting pastMeeting : pastMeetingListFound ) {
+            if ( pastMeeting.getNotes().equals(newNotes) ) {
+                // This is the meeting we created
+                searchedFoundMeeting = contactManager.getPastMeeting(pastMeeting.getId());
+                break;
             }
         }
 
-        // The final moment of truth
-        assertTrue(foundMeeting);
-
+        // The final moment of truth by checking the notes added.
+        assertEquals(searchedFoundMeeting.getNotes(),newNotes);
     }
 
     /** 
@@ -858,7 +859,7 @@ public class TestContactManager {
     public void testAddNewPastMeetingEmptyList() { 
         // Create an empty list
         Set<Contact> emptyList = new HashSet<Contact>();
-        
+
         // Expect exception.
         contactManager.addNewPastMeeting(emptyList, DATE_PAST, MEETING_NOTES_PAST);
     }
@@ -870,12 +871,12 @@ public class TestContactManager {
     public void testAddNewPastMeetingContactNonExistent() {
         // Create a new contact set list.
         Set<Contact> nonExistingContact = new HashSet<Contact>();
-        
+
         // Add a new contact that does not exist in the contact list
         nonExistingContact.add(new ContactImpl(CONTACT_ID_NOT_REAL, CONTACT_NAME_NOT_IN_MEETING, CONTACT_NOTES_NOT_IN_MEETING));
         
         // Expect an exception.
-        contactManager.addNewPastMeeting(notInMeetingsList, DATE_PAST, MEETING_NOTES_PAST);
+        contactManager.addNewPastMeeting(notInMeetingsContactList, DATE_PAST, MEETING_NOTES_PAST);
     }
     
     /** 
@@ -911,7 +912,7 @@ public class TestContactManager {
     @Test
     public void testAddFutureMeeting() { 
         // A new future meeting with contacts not in any meeting lists.
-        contactManager.addFutureMeeting(notInMeetingsList, DATE_FUTURE);
+        contactManager.addFutureMeeting(notInMeetingsContactList, DATE_FUTURE);
         
         // Get the future meetings on the future date supplied.
         List<Meeting> futureMeetingList = contactManager.getFutureMeetingList(DATE_FUTURE);
@@ -953,7 +954,7 @@ public class TestContactManager {
      */ 
     @Test(expected=IllegalArgumentException.class)
     public void testAddFutureMeetingWithUnknownContact() { 
-        contactManager.addFutureMeeting(bogusMeetingsList, DATE_FUTURE);
+        contactManager.addFutureMeeting(bogusContactList, DATE_FUTURE);
     }
     
     /** 
@@ -961,7 +962,7 @@ public class TestContactManager {
      */ 
     @Test(expected=IllegalArgumentException.class)
     public void testAddFutureMeetingWithNonExistentContact() {
-        contactManager.addFutureMeeting(bogusMeetingsList, DATE_FUTURE);
+        contactManager.addFutureMeeting(bogusContactList, DATE_FUTURE);
     }
     
     /** 
@@ -1248,14 +1249,16 @@ public class TestContactManager {
      */ 
     @Test
     public void testGetFutureMeetingListByDateNoneFound() {
-        List<Meeting> foundNoFutureMeetingsList = contactManager.getFutureMeetingList(DATE_FUTURE);
+        Calendar endOfTimeDate = DATE_FUTURE;
+        endOfTimeDate.add(Calendar.YEAR, 10000);
+
+        List<Meeting> foundNoFutureMeetingsList = contactManager.getFutureMeetingList(endOfTimeDate);
 
         // Empty list is not a null response.
         assertNotNull(foundNoFutureMeetingsList);
 
         // Check it is empty
         assertTrue(foundNoFutureMeetingsList.size() == 0);
-
     }
 
 
@@ -1367,9 +1370,8 @@ public class TestContactManager {
         jArray.add(jUtils.toJSONObject(pastContact));
         jArray.add(jUtils.toJSONObject(presentContact));
         jArray.add(jUtils.toJSONObject(futureContact));
+        jArray.add(jUtils.toJSONObject(notInMeetingContact));
         contactList.stream().forEach(contact -> jArray.add(jUtils.toJSONObject(contact)));
-        jArray.add(jUtils.toJSONObject(new ContactImpl(CONTACT_ID_MULTIPLE_SEARCH_RESULT, 
-                CONTACT_NAME_MULTIPLE_SEARCH_RESULT, CONTACT_NOTES_MULTIPLE)));
         return jArray;
     }
 
@@ -1447,9 +1449,9 @@ public class TestContactManager {
         // The future contact list.
         futureContactList.add(futureContact);
         // The not in meeting contact list.
-        notInMeetingsList.add(notInMeetingContact);
+        notInMeetingsContactList.add(notInMeetingContact);
         // The bogus contact list.
-        bogusMeetingsList.add(bogusContact);
+        bogusContactList.add(bogusContact);
     }
 
     /**
