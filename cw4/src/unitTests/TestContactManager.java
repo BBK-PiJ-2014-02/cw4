@@ -1079,7 +1079,8 @@ public class TestContactManager {
             else {
                 if ( previousMeeting.getDate().after(meeting.getDate()) ) {
                     sorted = false;
-                    continue;
+                    // Once one record is out of order, no need to keep checking
+                    break;
                 }
             }
         }
