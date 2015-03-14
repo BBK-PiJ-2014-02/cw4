@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -256,7 +257,22 @@ public class ContactManagerImpl implements ContactManager {
      */
     @Override
     public List<Meeting> getFutureMeetingList(Calendar date) {
-        return null;
+        List<Meeting> finalMeetingList = new LinkedList<Meeting>();
+
+        // Ensure that if date is null, an empty list is returned
+        if ( date == null ) return finalMeetingList;
+
+        for( Meeting meeting : meetingList ) {
+            // Check if meeting is in the future up to one second from now
+            if ( meeting.getDate().after(Calendar.getInstance()) ) {
+                finalMeetingList.add(meeting);
+            }
+        }
+
+        // Get the list sorted by date.
+        Collections.sort(finalMeetingList,new MeetingComparator());
+
+        return finalMeetingList;
     }
 
     /**
