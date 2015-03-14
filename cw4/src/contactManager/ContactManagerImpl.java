@@ -219,6 +219,9 @@ public class ContactManagerImpl implements ContactManager {
         // If no contact given, return an empty list
         if ( contact == null ) return new LinkedList<Meeting>();
 
+        // If contact is not valid, throw exception
+        if ( !hasContact(contact.getId()) ) throw new IllegalArgumentException();
+
         // Final FutureMeeting list to be returned
         List<Meeting> finalFutureMeetingList = new LinkedList<Meeting>();
 
