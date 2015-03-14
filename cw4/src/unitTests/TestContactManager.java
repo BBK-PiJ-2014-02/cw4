@@ -695,7 +695,7 @@ public class TestContactManager {
 
         // Check first that the pastMeetingList is not null before any further operations.
         assertNotNull(pastMeetingList);
-        
+
         // Only expecting one result
         assertTrue(pastMeetingList.size() == 1);
         
@@ -970,21 +970,21 @@ public class TestContactManager {
     @Test
     public void testGetFutureMeetingId() {
         // Get the future meeting
-        FutureMeeting futureMeeting = contactManager.getFutureMeeting(CONTACT_ID_FUTURE);
+        FutureMeeting futureMeeting = contactManager.getFutureMeeting(MEETING_ID_FUTURE);
 
         // Check that we have a future meeting
         assertNotNull(futureMeeting);
 
         // Check that the returned elements match
-        assertEquals(CONTACT_ID_FUTURE,futureMeeting.getId());
-        assertEquals(DATE_FUTURE, futureMeeting.getDate());
+        assertEquals(MEETING_ID_FUTURE,futureMeeting.getId());
+        verify(DATE_FUTURE, futureMeeting.getDate());
         Set<Contact> contactsSet = futureMeeting.getContacts();
 
         // Ensure we got a contactsSet
         assertNotNull(contactsSet);
 
         // Check that we have this contact in the found list.
-        assertTrue(contactsSet.contains(futureContact));
+        contactsSet.stream().forEach(contact -> verify(contact,futureContact) );
     }
 
     /** 
