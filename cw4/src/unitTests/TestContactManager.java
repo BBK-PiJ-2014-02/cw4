@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -369,15 +372,9 @@ public class TestContactManager {
     // ********************************** BEFORE ********************************* //
     /**
      * Loading all needed values to be ready for each test.
-     * 
-     * Requested synchronisation to prevent multiple test threads requesting
-     * original test file generation at same or different times, conflicting
-     * with other tests, and thus invalidating test results.
-     * 
-     * Once the contactManager is initialized, files can change freely.
      */
     @Before
-    public synchronized void before() {
+    public void before() {
         // Contact initialisations.
         defaultContactInit();
 
@@ -1261,15 +1258,36 @@ public class TestContactManager {
      */ 
     @Test
     public void testFlush() {
+        // Create a new contact and load it into memory.
         String newNotes = "Completely new notes";
-        contactManager.addMeetingNotes(MEETING_ID_PAST, newNotes);
+        String newName = "Completely new name";
+        contactManager.addNewContact(newName, newNotes);
         contactManager.flush();
 
-        // Initialise a new instance of the ContactManager to load saved data.
-        ContactManager cm = new ContactManagerImpl(TEST_DATA_FILE);
-        PastMeeting meetingFound = cm.getPastMeeting(MEETING_ID_PAST);
-        assertNotNull(meetingFound);
-        assertEquals(newNotes,meetingFound.getNotes());
+        // Load the hopefully saved file with the new Contact.
+        List<Contact> newList = null;
+        try {
+            newList = loadContactData(new File(TEST_DATA_FILE));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Check if the new List contains the new contact.
+        Contact newContact = null;
+        for(Contact contact : newList ) {
+            if ( contact.getName().equals(newName) && contact.getNotes().equals(newNotes) ) {
+                newContact = contact;
+                break;
+            }
+        }
+
+        // Time to cross-check it by Name and Notes.
+        assertNotNull(newList);
+        assertNotNull(newContact);
+        assertEquals(newContact.getName(),newName);
+        assertEquals(newContact.getNotes(),newNotes);
     }
 
     /** 
@@ -1609,5 +1627,69 @@ public class TestContactManager {
         assertEquals(expected.get(Calendar.HOUR_OF_DAY),found.get(Calendar.HOUR_OF_DAY));
         assertEquals(expected.get(Calendar.MINUTE),found.get(Calendar.MINUTE));
         assertEquals(expected.get(Calendar.SECOND),found.get(Calendar.SECOND));
+    }
+
+    /**
+     * Loads all Contact from the given file name and returns all Contacts in a list form.
+     */
+    private List<Contact> loadContactData(File file) throws ParseException, IOException {
+        List<Contact> finalList = new LinkedList<Contact>();
+
+        // If no file, return an empty list.
+        if ( !file.exists() ) return finalList;
+
+        // Create a new instance of the JUtils.
+        JSONUtils jUtils = new JSONUtilsImpl();
+
+        // Prepare to load from file.
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new FileReader(file));
+            String line;
+            while((line = in.readLine()) != null ) {
+                JSONParser parser = new JSONParser();
+                JSONObject jo     = (JSONObject) parser.parse(line);
+
+                // If the json object is not null, collect the key values and then 
+                // loop through them, converting the values into the expected object form
+                @SuppressWarnings("rawtypes")
+                Iterator joIterator = jo.keySet().iterator();
+
+                // Loop through all available keys to load from file.
+                while( joIterator.hasNext()) {
+
+                    // Get the next key
+                    String joKey = joIterator.next().toString();
+
+                    // Grab the value associated to the above key
+                    JSONArray joArray = (JSONArray) parser.parse(jo.get(joKey).toString());
+
+                    // Instantiate a new JSON Object element
+                    JSONObject element = new JSONObject();
+
+                    // Switch for all possible expected keys to process data
+                    switch (joKey) {
+                        // Check if found joKey is a CONTACT_KEY
+                        case CONTACT_KEY : {
+                           // Loop through all elements and load them into the contactList.
+                           for( int i = 0; i < joArray.size(); i++ ) {
+                               element = (JSONObject) joArray.get(i);
+                               finalList.add(jUtils.toContact(element));
+                           }
+                           break;
+                        }
+                    }
+                }
+            }
+
+            // Close Buffer if not closed yet.
+            if ( in != null ) in.close();
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return finalList;
     }
 }
