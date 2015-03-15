@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -65,7 +64,7 @@ public class ContactManagerImpl implements ContactManager {
     private Set<Contact> contactList;
 
     /**
-     * The next Meeting Id
+     * The next Meeting Id free slot
      */
     private Integer meetingId;
 
@@ -139,7 +138,21 @@ public class ContactManagerImpl implements ContactManager {
             Long contactFound = contactList.stream().filter(c -> c.getId() == contact.getId() ).count(); 
             if ( !(contactFound == 1) ) throw new IllegalArgumentException();
         }
-        return 0;
+
+        // If date is in the past, throw exception
+        if ( date.before(Calendar.getInstance()) ) throw new IllegalArgumentException();
+
+        // Create a new future meeting to be added.
+        FutureMeeting futureMeeting = new FutureMeetingImpl(meetingId, date, contacts);
+
+        // Add the future meeting.
+        meetingList.add(futureMeeting);
+
+        // Increment the meeting count.
+        meetingId++;
+
+        // Return the meeting id created.
+        return (meetingId-1);
     }
 
     /**
@@ -320,6 +333,23 @@ public class ContactManagerImpl implements ContactManager {
      */
     @Override
     public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) { 
+        // Check if contacts set is null
+        if ( contacts == null ) throw new NullPointerException();
+
+        // Check if date is null
+        if ( date == null ) throw new NullPointerException();
+
+        // Check if text null
+        if ( text == null ) throw new NullPointerException();
+
+        // Check if contacts set is empty
+        if ( contacts.size() == 0 ) throw new IllegalArgumentException();
+
+        // Check all contacts to see if any does not exist
+        for(Contact contact : contacts ) {
+            if( !hasContact(contact.getId()) ) throw new IllegalArgumentException();
+        }
+
         // Create a new past meeting
         PastMeeting pastMeeting = new PastMeetingImpl(contactId, date, contacts, text);
 
@@ -412,7 +442,6 @@ public class ContactManagerImpl implements ContactManager {
      */
     @Override
     public void flush() {
-        meetingList.stream().forEach(m->System.out.println(m.getId()+", "+m.getDate().getTime()));
         try {
             saveData();
         } catch (IOException e) {
@@ -547,6 +576,10 @@ public class ContactManagerImpl implements ContactManager {
                     }
                 }
             }
+
+            // Close Buffer if not closed yet.
+            if ( in != null ) in.close();
+
         } catch (ParseException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -610,14 +643,16 @@ public class ContactManagerImpl implements ContactManager {
         FileWriter fw = null;
         try {
             fw = new FileWriter(file);
-               fw.write(jFinal.toJSONString());
-               fw.flush();
+            fw.write(jFinal.toJSONString());
+            fw.flush();
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            // Ensure the file handler is closed at exception
             if ( fw != null ) fw.close();
-        } finally {
-            fw.close();
         }
+
+        // Ensure handler is closed in the end.
+        fw.close();
     }
 }
