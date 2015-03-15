@@ -1,6 +1,10 @@
 package unitTests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,7 +14,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -131,11 +134,7 @@ public class TestContactManager {
     private Set<Contact> multipleContactList = new HashSet<Contact>();
     
     // ********************************* NEW CONTACT ******************************* //
-    /**
-     * New contact id.
-     */
-    private final int CONTACT_ID_NEW = 3;
-    
+
     /**
      * New contact to be added, not in the list.
      */
@@ -324,11 +323,6 @@ public class TestContactManager {
     private final int MEETING_ID_FUTURE_PAST_DATE = 5;
 
     /**
-     * Future Meeting notes.
-     */
-    private final String MEETING_NOTES_FUTURE = "Future meeting notes";
-
-    /**
      * Meeting Past Date.
      */
     private Calendar DATE_PAST;
@@ -383,7 +377,7 @@ public class TestContactManager {
      * Once the contactManager is initialized, files can change freely.
      */
     @Before
-    public void before() {
+    public synchronized void before() {
         // Contact initialisations.
         defaultContactInit();
 
@@ -658,9 +652,11 @@ public class TestContactManager {
 
         // This is checking Meeting only
         assertEquals(MEETING_ID_PAST, pastMeetingFound.getId());
+
         // Verify all expected contacts are there.
         verifyContactLists(pastMeeting.getContacts(),pastMeetingFound.getContacts());
-        // Check the date of the meeting if matches the default expected.
+
+        // Check if predefined past meeting date matches the expected.
         verify(DATE_PAST, pastMeetingFound.getDate());
     }
     
@@ -876,7 +872,7 @@ public class TestContactManager {
         nonExistingContact.add(new ContactImpl(CONTACT_ID_NOT_REAL, CONTACT_NAME_NOT_IN_MEETING, CONTACT_NOTES_NOT_IN_MEETING));
         
         // Expect an exception.
-        contactManager.addNewPastMeeting(notInMeetingsContactList, DATE_PAST, MEETING_NOTES_PAST);
+        contactManager.addNewPastMeeting(nonExistingContact, DATE_PAST, MEETING_NOTES_PAST);
     }
     
     /** 
@@ -911,34 +907,30 @@ public class TestContactManager {
      */ 
     @Test
     public void testAddFutureMeeting() { 
+        // Create a new future date with today's date one year ahead.
+        Calendar dateFuture = Calendar.getInstance();
+        dateFuture.add(Calendar.YEAR, 1);
+
         // A new future meeting with contacts not in any meeting lists.
-        contactManager.addFutureMeeting(notInMeetingsContactList, DATE_FUTURE);
-        
-        // Get the future meetings on the future date supplied.
-        List<Meeting> futureMeetingList = contactManager.getFutureMeetingList(DATE_FUTURE);
-        
-        // Check we have got something
-        assertNotNull(futureMeetingList);
-        
-        // Need to iterate through all future meetings and contacts to check if the 
-        // contacts we have just added on the future meeting, were added.
-        // Please note that this test is expecting for the notInMeetingList to contain
-        // a set of contacts that have not yet been used elsewhere, thus, unique.
-        boolean wasCreated = false;
-        for(Meeting meeting: futureMeetingList) {
-            Set<Contact> contacts = meeting.getContacts();
-            if ( contacts != null ) {
-                Contact contactFound = contacts.iterator().next();
-                if ( contactFound.equals(notInMeetingContact)) {
-                    wasCreated = true;
-                    continue;
-                }
-            }
-        }
-        
-        // Ensure the meeting was created
-        assertTrue(wasCreated);
-        
+        Integer meetingId = contactManager.addFutureMeeting(notInMeetingsContactList, dateFuture);
+
+        // Get the future meeting that was created returning that id and check if the same.
+        FutureMeeting futureMeetingCreated = contactManager.getFutureMeeting(meetingId);
+        List<Meeting> futureMeetingListFromContact = contactManager.getFutureMeetingList(notInMeetingContact);
+
+        // Check we have got something.
+        assertNotNull(futureMeetingCreated);
+        assertNotNull(futureMeetingListFromContact);
+
+        // Check we have got only one.
+        assertTrue(futureMeetingListFromContact.size() == 1);
+
+        // The contact given to create the FutureMeeting is expected to be unique.
+        Meeting foundMeeting  = futureMeetingListFromContact.get(0);
+        Set<Contact> contacts = foundMeeting.getContacts();
+
+        // The one-only records in each list should perfectly match
+        verify(notInMeetingsContactList.iterator().next(),contacts.iterator().next());
     }
     
     /** 
@@ -1269,16 +1261,14 @@ public class TestContactManager {
      */ 
     @Test
     public void testFlush() {
-        // Add new notes to an existing meeting, flush, 
-        // create a new contactManager instance, and check for the new notes.
         String newNotes = "Completely new notes";
         contactManager.addMeetingNotes(MEETING_ID_PAST, newNotes);
         contactManager.flush();
 
+        // Initialise a new instance of the ContactManager to load saved data.
         ContactManager cm = new ContactManagerImpl(TEST_DATA_FILE);
         PastMeeting meetingFound = cm.getPastMeeting(MEETING_ID_PAST);
         assertNotNull(meetingFound);
-
         assertEquals(newNotes,meetingFound.getNotes());
     }
 
@@ -1529,18 +1519,28 @@ public class TestContactManager {
             while((line = in.readLine()) != null ) {
                fileWriter.write(line+"\n");
             }
-            fileWriter.flush();
-            fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
-            if ( fileWriter != null )
+            if ( fileWriter != null ) {
                 try {
                     fileWriter.close();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-        } finally {
+            }
+        }
+
+        if ( in != null ) {
             try {
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if ( fileWriter != null ) {
+            try {
+                fileWriter.flush();
                 fileWriter.close();
             } catch (IOException e) {
                 e.printStackTrace();
