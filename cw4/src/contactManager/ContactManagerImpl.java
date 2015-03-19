@@ -47,11 +47,26 @@ public class ContactManagerImpl implements ContactManager {
      * The known key name to define Contact objects in file.
      */
     private final String CONTACT_KEY = "contact";
-    
+
     /**
      * The known key name to define Meeting objects in file.
      */
     private final String MEETING_KEY = "meeting";
+
+    /**
+     * The meeting type key for PastMeeting.
+     */
+    private final String TYPE_PAST_MEETING = "PastMeeting";
+
+    /**
+     * The meeting type key for Meeting.
+     */
+    private final String TYPE_MEETING = "Meeting";
+
+    /**
+     * The meeting type key for FutureMeeting.
+     */
+    private final String TYPE_FUTURE_MEETING = "FutureMeeting";
     
     /**
      * The next Contact Id
@@ -140,7 +155,7 @@ public class ContactManagerImpl implements ContactManager {
         }
 
         // If date is in the past, throw exception
-        if ( date.before(Calendar.getInstance()) ) throw new IllegalArgumentException();
+        if ( date.before(Calendar.getInstance()) ) throw new IllegalArgumentException("Cannot add FutureMeeting with past date.");
 
         // Create a new future meeting to be added.
         FutureMeeting futureMeeting = new FutureMeetingImpl(meetingId, date, contacts);
@@ -170,24 +185,10 @@ public class ContactManagerImpl implements ContactManager {
         Calendar meetingDate = meeting.getDate();
 
         // Check if date is in the future
-        if ( meetingDate.after(Calendar.getInstance()) ) throw new IllegalArgumentException();
+        if ( meetingDate.after(Calendar.getInstance()) ) throw new IllegalArgumentException("Cannot get a PastMeeting with a future date.");
 
-        // Get contacts
-        Set<Contact> meetingContacts = meeting.getContacts();
-
-        // meetingNotes if we are dealing with a PastMeeting
-        String meetingNotes = "";
-
-        // Check if we have a PastMeeting and pick existing notes if so.
-        if ( meeting.getClass().getSimpleName().equals(PastMeetingImpl.class.getSimpleName())) {
-            PastMeeting pastMeeting = (PastMeeting) getMeeting(id);
-            meetingNotes = pastMeeting.getNotes();
-        }
-
-        // Create a PastMeeting
-        PastMeeting pastMeeting = new PastMeetingImpl(id, meetingDate, meetingContacts, meetingNotes);
-
-        return pastMeeting;
+        // Cast it into a PastMeeting
+        return (PastMeeting) meeting;
     }
 
     /**
@@ -538,7 +539,8 @@ public class ContactManagerImpl implements ContactManager {
                     // Instantiate a new JSON Object element
                     JSONObject element = new JSONObject();
 
-                    // Switch for all possible expected keys to process data
+                    // Switch for all possible expected Object keys to process data
+                    // e.g.: Contact Object, Meeting Objects
                     switch (joKey) {
 
                         // Check if found joKey is a CONTACT_KEY
@@ -560,10 +562,35 @@ public class ContactManagerImpl implements ContactManager {
                             // Loop through all elements and load them into the meetingList.
                             for( int i = 0; i < joArray.size(); i++ ) {
                                 element = (JSONObject) joArray.get(i);
-                                Meeting m = jUtils.toMeeting(element);
-                                if( !hasMeeting(m.getId()) ) {
-                                    meetingList.add(jUtils.toMeeting(element));
-                                    meetingId++;
+                                String meetingType = element.get("type").toString();
+                                switch (meetingType) {
+                                    case TYPE_MEETING : {
+                                        Meeting m = jUtils.toMeeting(element);
+                                        if( !hasMeeting(m.getId()) ) {
+                                            meetingList.add(jUtils.toMeeting(element));
+                                            meetingId++;
+                                        }
+                                        break;
+                                    }
+                                    case TYPE_PAST_MEETING : {
+                                        PastMeeting m = jUtils.toPastMeeting(element);
+                                        if( !hasMeeting(m.getId()) ) {
+                                            meetingList.add(jUtils.toPastMeeting(element));
+                                            meetingId++;
+                                        }
+                                        break;
+                                    }
+                                    case TYPE_FUTURE_MEETING : {
+                                        FutureMeeting m = jUtils.toFutureMeeting(element);
+                                        if( !hasMeeting(m.getId()) ) {
+                                            meetingList.add(jUtils.toFutureMeeting(element));
+                                            meetingId++;
+                                        }
+                                        break;
+                                    }
+                                    default : {
+                                        throw new IllegalArgumentException("Meeting type not known: " + meetingType);
+                                    }
                                 }
                             }
                             break;
