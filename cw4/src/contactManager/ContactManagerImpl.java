@@ -151,7 +151,7 @@ public class ContactManagerImpl implements ContactManager {
         for(Contact contact : contacts ) {
             // If we do not have one contact for each of the given contacts, throw exception
             Long contactFound = contactList.stream().filter(c -> c.getId() == contact.getId() ).count(); 
-            if ( !(contactFound == 1) ) throw new IllegalArgumentException();
+            if ( !(contactFound == 1) ) throw new IllegalArgumentException("Not a valid contact id: " + contact.getId());
         }
 
         // If date is in the past, throw exception
@@ -204,8 +204,8 @@ public class ContactManagerImpl implements ContactManager {
 
         Calendar date = meeting.getDate();
 
-        // Check date is not in the past, or thorw exception.
-        if ( date.before(Calendar.getInstance()) ) throw new IllegalArgumentException();
+        // Check date is not in the past, or throw exception.
+        if ( date.before(Calendar.getInstance()) ) throw new IllegalArgumentException("Cannot get a FutureMeeting with a past date.");
 
         Set<Contact> contacts = meeting.getContacts();
         FutureMeeting futureMeeting = new FutureMeetingImpl(id, date, contacts);
@@ -235,7 +235,7 @@ public class ContactManagerImpl implements ContactManager {
         if ( contact == null ) return new LinkedList<Meeting>();
 
         // If contact is not valid, throw exception
-        if ( !hasContact(contact.getId()) ) throw new IllegalArgumentException();
+        if ( !hasContact(contact.getId()) ) throw new IllegalArgumentException("Cannot find contact id: " + contact.getId());
 
         // Final FutureMeeting list to be returned
         List<Meeting> finalFutureMeetingList = new LinkedList<Meeting>();
@@ -296,7 +296,8 @@ public class ContactManagerImpl implements ContactManager {
         if ( contact == null ) return new LinkedList<PastMeeting>();
 
         // If contact does not exist, throw exception
-        if ( contactList.stream().filter(c -> c.getId() == contact.getId()).count() == 0 ) throw new IllegalArgumentException();
+        if ( contactList.stream().filter(c -> c.getId() == contact.getId()).count() == 0 ) 
+            throw new IllegalArgumentException("Unknown contact id: " + contact.getId());
 
         // The final returning List object
         List<PastMeeting> finalMeetingList = new LinkedList<PastMeeting>();
@@ -335,20 +336,21 @@ public class ContactManagerImpl implements ContactManager {
     @Override
     public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) { 
         // Check if contacts set is null
-        if ( contacts == null ) throw new NullPointerException();
+        if ( contacts == null ) throw new NullPointerException("No contacts supplied.");
 
         // Check if date is null
-        if ( date == null ) throw new NullPointerException();
+        if ( date == null ) throw new NullPointerException("No date supplied.");
 
         // Check if text null
-        if ( text == null ) throw new NullPointerException();
+        if ( text == null ) throw new NullPointerException("No notes supplied.");
 
         // Check if contacts set is empty
-        if ( contacts.size() == 0 ) throw new IllegalArgumentException();
+        if ( contacts.size() == 0 ) throw new IllegalArgumentException("Empty set of contacts.");
 
         // Check all contacts to see if any does not exist
         for(Contact contact : contacts ) {
-            if( !hasContact(contact.getId()) ) throw new IllegalArgumentException();
+            if( !hasContact(contact.getId()) ) 
+                throw new IllegalArgumentException("Unknown contact id: " + contact.getId());
         }
 
         // Create a new past meeting
@@ -367,19 +369,22 @@ public class ContactManagerImpl implements ContactManager {
     @Override
     public void addMeetingNotes(int id, String text) {
         // Throw exception if notes are null
-        if ( text == null ) throw new NullPointerException();
+        if ( text == null ) 
+            throw new NullPointerException("No text supplied.");
 
         // Get the respective meeting object for the given meeting id
         Meeting meeting = getMeeting(id);
 
         // Meeting must exist or throw exception.
-        if ( meeting == null ) throw new IllegalArgumentException();
+        if ( meeting == null ) 
+            throw new IllegalArgumentException("No meeting found with id: " + id);
 
         // Get the meeting's date.
         Calendar meetingDate = meeting.getDate();
 
         // Not allowed to add notes to a meeting set in the future.
-        if ( meetingDate.after(Calendar.getInstance())) throw new IllegalStateException();
+        if ( meetingDate.after(Calendar.getInstance())) 
+            throw new IllegalStateException("Cannot add notes to a meeting set in the future.");
 
         // Get the contacts
         Set<Contact> meetingContacts = meeting.getContacts();
@@ -398,8 +403,8 @@ public class ContactManagerImpl implements ContactManager {
      */
     @Override
     public void addNewContact(String name, String notes) {
-        if ( notes == null ) throw new NullPointerException();
-        if ( name == null ) throw new NullPointerException();
+        if ( notes == null ) throw new NullPointerException("No notes supplied.");
+        if ( name == null )  throw new NullPointerException("No name supplied.");
         Contact contact = new ContactImpl(this.contactId+1, name, notes);
         this.contactId++;
         contactList.add(contact);
@@ -422,7 +427,7 @@ public class ContactManagerImpl implements ContactManager {
         }
 
         // If no result is found, must throw exception as per interface
-        if (result.size() == 0) throw new IllegalArgumentException();
+        if (result.size() == 0) throw new IllegalArgumentException("No contact found.");
 
         return result;
     }
@@ -432,7 +437,7 @@ public class ContactManagerImpl implements ContactManager {
      */
     @Override
     public Set<Contact> getContacts(String name) {
-        if ( name == null ) throw new NullPointerException();
+        if ( name == null ) throw new NullPointerException("No name supplied.");
         return contactList.stream()
                 .filter(contact -> contact.getName().contains(name))
                 .collect(Collectors.toSet());
