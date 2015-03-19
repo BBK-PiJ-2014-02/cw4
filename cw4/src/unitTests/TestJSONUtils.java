@@ -17,11 +17,13 @@ import org.junit.Test;
 import contactManager.Contact;
 import contactManager.ContactImpl;
 import contactManager.FutureMeeting;
+import contactManager.FutureMeetingImpl;
 import contactManager.JSONUtils;
 import contactManager.JSONUtilsImpl;
 import contactManager.Meeting;
 import contactManager.MeetingImpl;
 import contactManager.PastMeeting;
+import contactManager.PastMeetingImpl;
 
 public class TestJSONUtils {
     /**
@@ -43,16 +45,6 @@ public class TestJSONUtils {
      * Meeting to convert to JSONObject.
      */
     private Meeting meeting;
-
-    /**
-     * PastMeeting to convert to JSONObject.
-     */
-    private PastMeeting pastMeeting;
-
-    /**
-     * FutureMeeting to convert to JSONObject.
-     */
-    private FutureMeeting futureMeeting;
 
     /**
      * The JSONObject with the date information.
@@ -125,24 +117,24 @@ public class TestJSONUtils {
     private final String CONTACT_NOTES = "Contact notes";
 
     /**
+     * The Past meeting id.
+     */
+    private final Integer MEETING_ID_PAST = 1;
+
+    /**
      * The meeting id.
      */
-    private final Integer MEETING_ID = 122;
+    private final Integer MEETING_ID = 2;
 
     /**
-     * The past meeting id.
+     * The Future meeting id.
      */
-    private final Integer MEETING_ID_PAST = 12;
-
-    /**
-     * The future meeting id.
-     */
-    private final Integer MEETING_ID_FUTURE = 1222;
+    private final Integer MEETING_ID_FUTURE = 3;
 
     /**
      * The meeting contacts.
      */
-    private Set<Contact> MEETING_CONTACTS;
+    private Set<Contact> contacts;
 
 
     /**
@@ -170,10 +162,10 @@ public class TestJSONUtils {
         // Set a list of contacts to be given to a meeting with
         // only the one contact we have to test, 
         // and create a meeting with the above set info.
-        MEETING_CONTACTS = new HashSet<Contact>();
-        MEETING_CONTACTS.add(contact);
+        contacts = new HashSet<Contact>();
+        contacts.add(contact);
         try {
-            meeting = new MeetingImpl(MEETING_ID, date, MEETING_CONTACTS);
+            meeting = new MeetingImpl(MEETING_ID, date, contacts);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -225,15 +217,6 @@ public class TestJSONUtils {
     }
 
     /**
-     * Test if given Meeting is correctly converted to a JSONObject.
-     */
-    @Test
-    public void testToJSONObjectFromMeeting() {
-        JSONObject foundJO = jUtils.toJSONObject(meeting);
-        assertEquals(jMeeting,foundJO);
-    }
-
-    /**
      * Given a JSONObject with Contact values, check if the returned
      * matches the original expected Contact.
      */
@@ -244,6 +227,15 @@ public class TestJSONUtils {
     }
 
     /**
+     * Test if given Meeting is correctly converted to a JSONObject.
+     */
+    @Test
+    public void testToJSONObjectFromMeeting() {
+        JSONObject foundJO = jUtils.toJSONObject(meeting);
+        assertEquals(jMeeting,foundJO);
+    }
+
+    /**
      * Given a JSONObject with Meeting values, check if the returned
      * matches the original expected Meeting.
      */
@@ -251,6 +243,91 @@ public class TestJSONUtils {
     public void testToMeetingFromJSON() {
         Meeting meetingFound = jUtils.toMeeting(jMeeting);
         verifyMeetings(meeting,meetingFound);
+    }
+
+    /**
+     * Test if given Meeting is correctly converted to a JSONObject.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testToJSONObjectFromPastMeeting() {
+        Set<Contact> contacts = new HashSet<Contact>();
+        contacts.add(contact);
+        PastMeeting pastMeeting = new PastMeetingImpl(12, date, contacts, "Some notes");
+        JSONObject foundJO = jUtils.toJSONObject(pastMeeting);
+
+        // Set the structure for the JSONObject type PastMeeting
+        JSONObject expectedMeeting = new JSONObject();
+        expectedMeeting.put("type", "PastMeeting");
+        expectedMeeting.put("id", 12);
+        expectedMeeting.put("date", jDate);
+        expectedMeeting.put("notes", "Some notes");
+
+        JSONArray jA = new JSONArray();
+                  jA.add(jUtils.toJSONObject(contact));
+
+        expectedMeeting.put("contacts", jA);
+
+        assertEquals(expectedMeeting,foundJO);
+    }
+
+    /**
+     * Given a JSONObject with PastMeeting values, check if the returned
+     * matches the original expected PastMeeting.
+     */
+    @Test
+    public void testToPastMeetingFromJSON() {
+        // The expected PastMeeting Object;
+        PastMeeting expectedPastMeeting = new PastMeetingImpl(MEETING_ID_PAST, date, contacts, "Some unique notes.");
+        PastMeeting pastMeetingFound = jUtils.toPastMeeting(jPastMeeting);
+
+        // Assert this was not returned null
+        assertNotNull(pastMeetingFound);
+
+        // Verify that both Past meetings as the same
+        verifyMeetings(expectedPastMeeting, pastMeetingFound);
+    }
+
+    /**
+     * Test if given FutureMeeting is correctly converted to a JSONObject.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testToJSONObjectFromFutureMeeting() {
+        Set<Contact> contacts = new HashSet<Contact>();
+        contacts.add(contact);
+        FutureMeeting futureMeeting = new FutureMeetingImpl(12, date, contacts);
+        JSONObject foundJO = jUtils.toJSONObject(futureMeeting);
+
+        // Set the structure for the JSONObject type FutureMeeting
+        JSONObject expectedMeeting = new JSONObject();
+        expectedMeeting.put("type", "FutureMeeting");
+        expectedMeeting.put("id", 12);
+        expectedMeeting.put("date", jDate);
+
+        JSONArray jA = new JSONArray();
+                  jA.add(jUtils.toJSONObject(contact));
+
+        expectedMeeting.put("contacts", jA);
+
+        assertEquals(expectedMeeting,foundJO);
+    }
+
+    /**
+     * Given a JSONObject with Meeting values, check if the returned
+     * matches the original expected Meeting.
+     */
+    @Test
+    public void testToFutureMeetingFromJSON() {
+        // The expected FutureMeeting Object;
+        FutureMeeting expectedFutureMeeting = new FutureMeetingImpl(MEETING_ID_FUTURE, date, contacts);
+        FutureMeeting futureMeetingFound = jUtils.toFutureMeeting(jFutureMeeting);
+
+        // Assert this was not returned null
+        assertNotNull(futureMeetingFound);
+
+        // Verify that both Future meetings as the same
+        verifyMeetings(expectedFutureMeeting, futureMeetingFound);
     }
 
     /**
@@ -316,6 +393,33 @@ public class TestJSONUtils {
      * @param found Meeting
      */
     private void verifyMeetings(Meeting expected, Meeting found) {
+        assertNotNull(found);
+        assertEquals(expected.getId(),found.getId());
+        verifyDate(expected.getDate(),found.getDate());
+        verifyContactList(expected.getContacts(),found.getContacts());
+    }
+
+    /**
+     * Asserting that the information on the PastMeetings match.
+     * 
+     * @param expected PastMeeting
+     * @param found PastMeeting
+     */
+    private void verifyMeetings(PastMeeting expected, PastMeeting found) {
+        assertNotNull(found);
+        assertEquals(expected.getId(),found.getId());
+        verifyDate(expected.getDate(),found.getDate());
+        verifyContactList(expected.getContacts(),found.getContacts());
+        assertEquals(expected.getNotes(),found.getNotes());
+    }
+
+    /**
+     * Asserting that the information on the FutureMeetings match.
+     * 
+     * @param expected FutureMeeting
+     * @param found FutureMeeting
+     */
+    private void verifyMeetings(FutureMeeting expected, FutureMeeting found) {
         assertNotNull(found);
         assertEquals(expected.getId(),found.getId());
         verifyDate(expected.getDate(),found.getDate());
