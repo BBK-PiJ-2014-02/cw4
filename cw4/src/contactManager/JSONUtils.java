@@ -55,4 +55,20 @@ public interface JSONUtils {
      * @return Meeting
      */
     Meeting toMeeting(JSONObject jObject);
+
+    /**
+     * Convert a JSONObject into a PastMeeting object
+     * 
+     * @param jObject of type meeting
+     * @return PastMeeting
+     */
+    PastMeeting toPastMeeting(JSONObject jObject);
+
+    /**
+     * Convert a JSONObject into a FutureMeeting object
+     * 
+     * @param jObject of type meeting
+     * @return FutureMeeting
+     */
+    FutureMeeting toFutureMeeting(JSONObject jObject);
 }
