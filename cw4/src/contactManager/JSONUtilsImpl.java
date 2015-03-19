@@ -21,6 +21,21 @@ import org.json.simple.JSONObject;
  */
 public class JSONUtilsImpl implements JSONUtils {
     /**
+     * The PastMeeting type.
+     */
+    private final String TYPE_PAST_MEETING = "PastMeeting";
+
+    /**
+     * The Meeting type.
+     */
+    private final String TYPE_MEETING = "Meeting";
+
+    /**
+     * The FutureMeeting type.
+     */
+    private final String TYPE_FUTURE_MEETING = "FutureMeeting";
+
+    /**
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
@@ -55,6 +70,10 @@ public class JSONUtilsImpl implements JSONUtils {
         jo.put("type", classSimpleName);
         jo.put("id", meeting.getId());
         jo.put("date", toJSONObject(meeting.getDate()));
+        if ( classSimpleName.equals(TYPE_PAST_MEETING)) {
+            PastMeeting pastMeeting = (PastMeeting) meeting;
+            jo.put("notes", pastMeeting.getNotes());
+        }
 
         JSONArray contactsJO = new JSONArray();
         for( Contact c : meeting.getContacts() ) {
@@ -85,7 +104,6 @@ public class JSONUtilsImpl implements JSONUtils {
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     @Override
     public Meeting toMeeting(JSONObject jObject) {
         // If jObject is null, return null
@@ -95,61 +113,109 @@ public class JSONUtilsImpl implements JSONUtils {
         String meetingInterface = jObject.get("type").toString();
 
         // Read the meeting id
-        Integer id      = Integer.valueOf(jObject.get("id").toString());
+        Integer id = Integer.valueOf(jObject.get("id").toString());
 
         // Load the date.
         JSONObject jDate = (JSONObject) jObject.get("date");
         Calendar date = toCalendar(jDate);
 
         // Load all set contacts.
-        Set<Contact> contacts = new HashSet<Contact>();
-        JSONArray jArray = (JSONArray) jObject.get("contacts");
-        Iterator<JSONObject> i = jArray.iterator();
-        while( i.hasNext() ) {
-            JSONObject jContact = i.next();
-            Contact c = toContact(jContact);
-            contacts.add(c);
+        Set<Contact> contacts = getContacts(jObject);
+
+        // Build the Meeting to be returned with all the above info
+        if ( meetingInterface.equals(TYPE_MEETING)) {
+            // Create the Meeting object to be returned.
+            Meeting meeting = null;
+            try {
+                meeting = new MeetingImpl(id,date,contacts);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return meeting;
         }
+        else {
+            throw new IllegalArgumentException("Cannot convert a meeting type " + meetingInterface + " into a Meeting.");
+        }
+    }
 
-        switch (meetingInterface) {
-            case "Meeting" : {
-                // Create the Meeting object to be returned.
-                Meeting meeting = null;
-                try {
-                    meeting = new MeetingImpl(id,date,contacts);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PastMeeting toPastMeeting(JSONObject jObject) {
+        // If jObject is null, return null
+        if ( jObject == null ) return null;
 
-                return meeting;
+        // Read the meeting Interface to be had
+        String meetingInterface = jObject.get("type").toString();
+
+        // Read the meeting id
+        Integer id = Integer.valueOf(jObject.get("id").toString());
+
+        // Load the date.
+        JSONObject jDate = (JSONObject) jObject.get("date");
+        Calendar date = toCalendar(jDate);
+
+        // Load all set contacts.
+        Set<Contact> contacts = getContacts(jObject);
+
+        // Build the PastMeeting to be returned with all the above info
+        if ( meetingInterface.equals(TYPE_PAST_MEETING)) {
+            // Create the PastMeeting object to be returned.
+            PastMeeting pastMeeting = null;
+
+            // Get the Notes
+            String notes = jObject.get("notes").toString();
+
+            try {
+                pastMeeting = new PastMeetingImpl(id,date,contacts,notes);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            case "PastMeeting" : {
-                // Create the Meeting object to be returned.
-                PastMeeting meeting = null;
-                try {
-                    String notes = (String) jObject.get("notes");
-                    meeting = new PastMeetingImpl(id,date,contacts,notes);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
 
-                return meeting;
-            }
-            case "FutureMeeting" : {
-                // Create the Meeting object to be returned.
-                FutureMeeting meeting = null;
-                try {
-                    meeting = new FutureMeetingImpl(id,date,contacts);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            return pastMeeting;
+        }
+        else {
+            throw new IllegalArgumentException("Cannot convert a meeting type " + meetingInterface + " into a PastMeeting.");
+        }
+    }
 
-                return meeting;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FutureMeeting toFutureMeeting(JSONObject jObject) {
+        // If jObject is null, return null
+        if ( jObject == null ) return null;
+
+        // Read the meeting Interface to be had
+        String meetingInterface = jObject.get("type").toString();
+
+        // Read the meeting id
+        Integer id = Integer.valueOf(jObject.get("id").toString());
+
+        // Load the date.
+        JSONObject jDate = (JSONObject) jObject.get("date");
+        Calendar date = toCalendar(jDate);
+
+        // Load all set contacts.
+        Set<Contact> contacts = getContacts(jObject);
+
+        // Build the FutureMeeting to be returned with all the above info
+        if ( meetingInterface.equals(TYPE_FUTURE_MEETING)) {
+            // Create the FutureMeeting object to be returned.
+            FutureMeeting futureMeeting = null;
+            try {
+                futureMeeting = new FutureMeetingImpl(id,date,contacts);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
-            default : {
-                throw new IllegalArgumentException();
-            }
+            return futureMeeting;
+        }
+        else {
+            throw new IllegalArgumentException("Cannot convert a meeting type " + meetingInterface + " into a FutureMeeting.");
         }
     }
 
@@ -203,5 +269,26 @@ public class JSONUtilsImpl implements JSONUtils {
         date.set(year, month, day, hour, minute, second);
 
         return date;
+    }
+
+    /**
+     * Convert JSON Object with key contacts into a Set of Contact objects
+     * 
+     * @param jObject JSONObject
+     * @return Set of Contact objects
+     */
+    private Set<Contact> getContacts(JSONObject jObject) {
+        Set<Contact> contacts = new HashSet<Contact>();
+        new HashSet<Contact>();
+        JSONArray jArray = (JSONArray) jObject.get("contacts");
+        @SuppressWarnings("unchecked")
+        Iterator<JSONObject> i = jArray.iterator();
+        while( i.hasNext() ) {
+            JSONObject jContact = i.next();
+            Contact c = toContact(jContact);
+            contacts.add(c);
+        }
+
+        return contacts;
     }
 }
