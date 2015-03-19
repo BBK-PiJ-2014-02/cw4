@@ -372,6 +372,33 @@ public class TestJSONUtils {
     }
 
     /**
+     * Testing exception on conversion to PastMeeting 
+     * when JObject is not with type PastMeeting
+     */
+    @Test(expected=IllegalArgumentException.class)
+    public void testExceptionJSONToPastMeeting() {
+        jUtils.toPastMeeting(jFutureMeeting);
+    }
+
+    /**
+     * Testing exception on conversion to Meeting 
+     * when JObject is not with type Meeting
+     */
+    @Test(expected=IllegalArgumentException.class)
+    public void testExceptionJSONToMeeting() {
+        jUtils.toMeeting(jFutureMeeting);
+    }
+
+    /**
+     * Testing exception on conversion to FutureMeeting 
+     * when JObject is not with type FutureMeeting
+     */
+    @Test(expected=IllegalArgumentException.class)
+    public void testExceptionJSONToFutureMeeting() {
+        jUtils.toFutureMeeting(jMeeting);
+    }
+
+    /**
      * Asserting that the information is the same, regardless of the object address.
      * 
      * @param expected Contact
