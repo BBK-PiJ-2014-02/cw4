@@ -27,10 +27,20 @@ import contactManager.PastMeetingImpl;
 
 public class TestJSONUtils {
     /**
-     * The JSONUtils object handler.
+     * The PastMeeting type.
      */
-    private JSONUtils jUtils;
+    private final String TYPE_PAST_MEETING = "PastMeeting";
+
+    /**
+     * The Meeting type.
+     */
+    private final String TYPE_MEETING = "Meeting";
     
+    /**
+     * The FutureMeeting type.
+     */
+    private final String TYPE_FUTURE_MEETING = "FutureMeeting";
+
     /**
      * Calendar date to convert to JSONObject.
      */
@@ -132,9 +142,19 @@ public class TestJSONUtils {
     private final Integer MEETING_ID_FUTURE = 3;
 
     /**
+     * The meeting notes.
+     */
+    private final String MEETING_NOTES = "Meeting notes";
+
+    /**
      * The meeting contacts.
      */
     private Set<Contact> contacts;
+
+    /**
+     * The JSONUtils object handler.
+     */
+    private JSONUtils jUtils;
 
 
     /**
@@ -178,7 +198,7 @@ public class TestJSONUtils {
                 
         // Set the structure for the JSONObject type Meeting
         jMeeting = new JSONObject();
-        jMeeting.put("type", "Meeting");
+        jMeeting.put("type", TYPE_MEETING);
         jMeeting.put("id", MEETING_ID);
         jMeeting.put("date", jDate);
 
@@ -189,16 +209,17 @@ public class TestJSONUtils {
 
         // Set the structure for the JSONObject type PastMeeting
         jPastMeeting = new JSONObject();
-        jPastMeeting.put("type", "PastMeeting");
-        jPastMeeting.put("id", MEETING_ID);
+        jPastMeeting.put("type", TYPE_PAST_MEETING);
+        jPastMeeting.put("id", MEETING_ID_PAST);
         jPastMeeting.put("date", jDate);
+        jPastMeeting.put("notes", MEETING_NOTES);
 
         jPastMeeting.put("contacts", jA);
 
         // Set the structure for the JSONObject type FutureMeeting
         jFutureMeeting = new JSONObject();
-        jFutureMeeting.put("type", "FutureMeeting");
-        jFutureMeeting.put("id", MEETING_ID);
+        jFutureMeeting.put("type", TYPE_FUTURE_MEETING);
+        jFutureMeeting.put("id", MEETING_ID_FUTURE);
         jFutureMeeting.put("date", jDate);
 
         jFutureMeeting.put("contacts", jA);
@@ -253,15 +274,15 @@ public class TestJSONUtils {
     public void testToJSONObjectFromPastMeeting() {
         Set<Contact> contacts = new HashSet<Contact>();
         contacts.add(contact);
-        PastMeeting pastMeeting = new PastMeetingImpl(12, date, contacts, "Some notes");
+        PastMeeting pastMeeting = new PastMeetingImpl(MEETING_ID_PAST, date, contacts, MEETING_NOTES);
         JSONObject foundJO = jUtils.toJSONObject(pastMeeting);
 
         // Set the structure for the JSONObject type PastMeeting
         JSONObject expectedMeeting = new JSONObject();
-        expectedMeeting.put("type", "PastMeeting");
-        expectedMeeting.put("id", 12);
+        expectedMeeting.put("type", TYPE_PAST_MEETING);
+        expectedMeeting.put("id", MEETING_ID_PAST);
         expectedMeeting.put("date", jDate);
-        expectedMeeting.put("notes", "Some notes");
+        expectedMeeting.put("notes", MEETING_NOTES);
 
         JSONArray jA = new JSONArray();
                   jA.add(jUtils.toJSONObject(contact));
@@ -278,7 +299,7 @@ public class TestJSONUtils {
     @Test
     public void testToPastMeetingFromJSON() {
         // The expected PastMeeting Object;
-        PastMeeting expectedPastMeeting = new PastMeetingImpl(MEETING_ID_PAST, date, contacts, "Some unique notes.");
+        PastMeeting expectedPastMeeting = new PastMeetingImpl(MEETING_ID_PAST, date, contacts, MEETING_NOTES);
         PastMeeting pastMeetingFound = jUtils.toPastMeeting(jPastMeeting);
 
         // Assert this was not returned null
@@ -301,7 +322,7 @@ public class TestJSONUtils {
 
         // Set the structure for the JSONObject type FutureMeeting
         JSONObject expectedMeeting = new JSONObject();
-        expectedMeeting.put("type", "FutureMeeting");
+        expectedMeeting.put("type", TYPE_FUTURE_MEETING);
         expectedMeeting.put("id", 12);
         expectedMeeting.put("date", jDate);
 
