@@ -7,7 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -242,7 +241,7 @@ public class ContactManagerImpl implements ContactManager {
 
         for(Meeting meeting : meetingList ) {
             // Only interested in the FutureMeeting types.
-            if ( meeting.getClass().getSimpleName().equals(FutureMeetingImpl.class.getSimpleName())) {
+            if ( FutureMeeting.class.isInstance(meeting)) {
                 Set<Contact> contacts = meeting.getContacts();
                 // Check if this meeting has this contact in.
                 Long numberOfContactsFound = contacts.stream().filter(c -> c.getId() == contact.getId() ).count();
@@ -254,16 +253,6 @@ public class ContactManagerImpl implements ContactManager {
         Collections.sort(finalFutureMeetingList, new MeetingComparator());
 
         return finalFutureMeetingList;
-    }
-
-    // TODO: Get this into a new class file.
-    class MeetingComparator implements Comparator<Meeting> {
-        @Override
-        public int compare(Meeting o1, Meeting o2) {
-            if ( o1.getDate().after(o2.getDate()) ) return 1;
-            if ( o1.getDate().before(o2.getDate()) ) return -1;
-            return 0;
-        }
     }
 
     /**
@@ -305,29 +294,19 @@ public class ContactManagerImpl implements ContactManager {
         // Go over each meeting and check if the above contact exists in it.
         for(Meeting meeting : meetingList ) {
             // If this is not a PastMeeting, skip to next.
-            if ( !meeting.getClass().getSimpleName().equals(PastMeetingImpl.class.getSimpleName())) continue;
+            if ( !PastMeeting.class.isInstance(meeting)) continue;
 
             // Check if we have the expected contact in this meeting
             Set<Contact> contactList = meeting.getContacts();
-            if ( contactList.stream().filter(c -> c.getId() == contact.getId()).count() > 0 ) {
+            if ( contactList.stream().filter(c -> c.getId() == contact.getId()).count() == 1 ) {
                 // Found the contact id in the list of contacts for this meeting, add it to the final list.
                 finalMeetingList.add((PastMeeting)meeting);
             }
         }
 
-        Collections.sort(finalMeetingList, new PastMeetingComparator());
+        Collections.sort(finalMeetingList, new MeetingComparator());
 
         return finalMeetingList;
-    }
-
-    // TODO: Get this into a new class file.
-    class PastMeetingComparator implements Comparator<PastMeeting> {
-        @Override
-        public int compare(PastMeeting o1, PastMeeting o2) {
-            if ( o1.getId() < o2.getId() ) return 1;
-            if ( o1.getId() > o2.getId() ) return -1;
-            return 0;
-        }
     }
 
     /**
