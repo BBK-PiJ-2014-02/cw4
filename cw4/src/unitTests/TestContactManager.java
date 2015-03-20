@@ -309,6 +309,21 @@ public class TestContactManager {
      * Past Meeting id.
      */
     private final int MEETING_ID_PAST = 3;
+
+    /**
+     * Past Meeting id shared.
+     */
+    private final int MEETING_ID_PAST_1 = 31;
+
+    /**
+     * Past Meeting id shared.
+     */
+    private final int MEETING_ID_PAST_2 = 32;
+
+    /**
+     * Past Meeting id shared.
+     */
+    private final int MEETING_ID_PAST_3 = 33;
     
     /**
      * Past Meeting notes.
@@ -348,6 +363,24 @@ public class TestContactManager {
      * The Past Meeting testing object handler.
      */
     private Meeting pastMeeting;
+
+    /**
+     * The Past Meeting testing object handler.
+     * Same contact will be shared on these meetings.
+     */
+    private Meeting pastMeeting1;
+
+    /**
+     * The Past Meeting testing object handler.
+     * Same contact will be shared on these meetings.
+     */
+    private Meeting pastMeeting2;
+
+    /**
+     * The Past Meeting testing object handler.
+     * Same contact will be shared on these meetings.
+     */
+    private Meeting pastMeeting3;
 
     /**
      * The Present Meeting testing object handler.
@@ -601,7 +634,7 @@ public class TestContactManager {
         contactManager.addMeetingNotes(MEETING_ID_FUTURE_PAST_DATE, MEETING_NOTES_PRESENT);
         Meeting meetingFound = contactManager.getMeeting(MEETING_ID_FUTURE_PAST_DATE);
         assertNotNull(meetingFound);
-        assertEquals(PastMeetingImpl.class,meetingFound.getClass());
+        assertTrue(PastMeeting.class.isInstance(meetingFound));
     }
     
     /** 
@@ -682,31 +715,23 @@ public class TestContactManager {
         // Get the PastMeeting List with one result only, where this past Contact has been present.
         List<PastMeeting> pastMeetingList = contactManager.getPastMeetingList(pastContact);
 
-        // Check first that the pastMeetingList is not null before any further operations.
+        // Check that we have at least one result.
         assertNotNull(pastMeetingList);
+        assertTrue(pastMeetingList.size() > 0);
 
-        // Only expecting one result
-        assertTrue(pastMeetingList.size() == 1);
-        
-        // Get the one result PastMeeting
-        PastMeeting pastMeeting = pastMeetingList.get(0);
-        
-        // Check the contacts of this meeting
-        Set<Contact> pastContactSetFound = pastMeeting.getContacts();
-        
-        // Expect a not null contact list
-        assertNotNull(pastContactSetFound);
+        // Go over all meetings and check that the pastContact is found in all.
+        for ( PastMeeting pastMeeting : pastMeetingList ) {
 
-        // Check if only one contact is found.
-        assertTrue(pastContactSetFound.size() == 1);
-        
-        // Get the respective contact
-        Contact pastContactFound = pastContactSetFound.iterator().next();
-        
-        // Assert that the contact found is the one we expect.
-        assertEquals(pastContact.getId(), pastContactFound.getId());
-        assertEquals(pastContact.getName(), pastContactFound.getName());
-        assertEquals(pastContact.getNotes(), pastContactFound.getNotes());
+            // Check the contacts of this meeting
+            Set<Contact> pastContactSetFound = pastMeeting.getContacts();
+
+            // Check we have at least one result
+            assertNotNull(pastContactSetFound);
+            assertTrue(pastContactSetFound.size() > 0);
+
+            // Check that for all contacts in list, we count one and only one that matches the pastContact
+            assertEquals(pastContactSetFound.stream().filter(c -> c.getId() == pastContact.getId()).count(), 1);
+        }
     }
     
     /** 
@@ -733,19 +758,17 @@ public class TestContactManager {
         // Get a list of past meetings.
         List<PastMeeting> pastMeetingList = contactManager.getPastMeetingList(pastContact);
 
-        // Check that we do not have a null list.
+        // Check that we have at least two records.
         assertNotNull(pastMeetingList);
+        assertTrue(pastMeetingList.size() > 1);
 
-        // Expect at least one element.
-        assertTrue(pastMeetingList.size() > 0);
-
-        // Keep a record of previous checked date
+        // Keep a record of previous checked date to check the sort
         Calendar previousDate = null;
 
-        // Keep a flag on all sorted until told otherwise..
+        // Set sorting flag to true, until it is not..
         Boolean sorted = true;
 
-        // Check that these come all sorted
+        // Check each record in turn
         for(PastMeeting pastMeeting : pastMeetingList) {
             if ( previousDate == null ) {
                 previousDate = pastMeeting.getDate();
@@ -756,7 +779,7 @@ public class TestContactManager {
                 }
                 else {
                     sorted = false;
-                    continue;
+                    break;
                 }
             }
         }
@@ -771,14 +794,10 @@ public class TestContactManager {
     @Test
     public void testGetPastMeetingListNoDups() {
         // Get the list.
-        List<PastMeeting> pastMeetingFound = contactManager.getPastMeetingList(pastContact);
+        List<PastMeeting> pastMeetingFound = contactManager.getPastMeetingList(multipleContactList.iterator().next());
 
-        // Ensure we have one
+        // Ensure we have at least one
         assertNotNull(pastMeetingFound);
-
-        // TODO:
-        // Ensure it is not empty and more than one element is found.
-        // This forces to revisit the test if only one element is produced.
         assertTrue(pastMeetingFound.size() > 0);
 
         // Start with the right foot
@@ -791,7 +810,7 @@ public class TestContactManager {
         for( PastMeeting pastMeeting : pastMeetingFound ) {
             if ( pastMeetingSeen.contains(pastMeeting) ) {
                 hasDuplicates = true;
-                continue;
+                break;
             }
             pastMeetingSeen.add(pastMeeting);
         }
@@ -1016,7 +1035,7 @@ public class TestContactManager {
 
         // Check that we have the expected future meeting
         for( Meeting meetingFound : futureMeetingsFound ) {
-            if ( meetingFound.getClass().getSimpleName().equals(FutureMeetingImpl.class.getSimpleName()) ) {
+            if ( FutureMeeting.class.isInstance(meetingFound) ) {
                 gotFutureMeeting = true;
             } else {
                 gotOtherMeetings = true;
@@ -1397,6 +1416,9 @@ public class TestContactManager {
     private JSONArray getMeetingsInJSONArray() {
         JSONArray jMeetings = new JSONArray();
         jMeetings.add(jUtils.toJSONObject(pastMeeting));
+        jMeetings.add(jUtils.toJSONObject(pastMeeting1));
+        jMeetings.add(jUtils.toJSONObject(pastMeeting2));
+        jMeetings.add(jUtils.toJSONObject(pastMeeting3));
         jMeetings.add(jUtils.toJSONObject(presentMeeting));
         jMeetings.add(jUtils.toJSONObject(futureMeeting));
         jMeetings.add(jUtils.toJSONObject(futureMeetingPastDate));
@@ -1408,7 +1430,22 @@ public class TestContactManager {
      */
     private void defaultMeetingInit() {
         try {
+            // Set some minute differences between these meetings
+            // to be later sorted.
+            Calendar dateMeeting1 = Calendar.getInstance();
+            Calendar dateMeeting2 = Calendar.getInstance();
+            Calendar dateMeeting3 = Calendar.getInstance();
+            dateMeeting1.add(Calendar.YEAR, -1);
+            dateMeeting2.add(Calendar.YEAR, -1);
+            dateMeeting3.add(Calendar.YEAR, -1);
+            dateMeeting1.add(Calendar.MINUTE, 1);
+            dateMeeting2.add(Calendar.MINUTE, 2);
+            dateMeeting3.add(Calendar.MINUTE, 3);
+
             pastMeeting           = new PastMeetingImpl(MEETING_ID_PAST,DATE_PAST,pastContactList,MEETING_NOTES_PAST);
+            pastMeeting1          = new PastMeetingImpl(MEETING_ID_PAST_1,dateMeeting1,multipleContactList,MEETING_NOTES_PAST);
+            pastMeeting2          = new PastMeetingImpl(MEETING_ID_PAST_2,dateMeeting2,multipleContactList,MEETING_NOTES_PAST);
+            pastMeeting3          = new PastMeetingImpl(MEETING_ID_PAST_3,dateMeeting3,multipleContactList,MEETING_NOTES_PAST);
             presentMeeting        = new MeetingImpl(MEETING_ID_PRESENT,DATE_PRESENT,presentContactList);
             futureMeeting         = new FutureMeetingImpl(MEETING_ID_FUTURE,DATE_FUTURE,futureContactList);
             futureMeetingPastDate = new FutureMeetingImpl(MEETING_ID_FUTURE_PAST_DATE,DATE_PAST,futureContactList);
