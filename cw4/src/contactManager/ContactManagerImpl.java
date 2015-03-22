@@ -68,7 +68,7 @@ public class ContactManagerImpl implements ContactManager {
     private final String TYPE_FUTURE_MEETING = "FutureMeeting";
     
     /**
-     * The next Contact Id
+     * The last added Contact Id
      */
     private Integer contactId;
 
@@ -78,7 +78,7 @@ public class ContactManagerImpl implements ContactManager {
     private Set<Contact> contactList;
 
     /**
-     * The next Meeting Id free slot
+     * The last added Meeting Id free slot
      */
     private Integer meetingId;
 
@@ -157,7 +157,7 @@ public class ContactManagerImpl implements ContactManager {
         if ( date.before(Calendar.getInstance()) ) throw new IllegalArgumentException("Cannot add FutureMeeting with past date.");
 
         // Create a new future meeting to be added.
-        FutureMeeting futureMeeting = new FutureMeetingImpl(meetingId, date, contacts);
+        FutureMeeting futureMeeting = new FutureMeetingImpl(meetingId+1, date, contacts);
 
         // Add the future meeting.
         meetingList.add(futureMeeting);
@@ -166,7 +166,7 @@ public class ContactManagerImpl implements ContactManager {
         meetingId++;
 
         // Return the meeting id created.
-        return (meetingId-1);
+        return meetingId;
     }
 
     /**
@@ -333,7 +333,7 @@ public class ContactManagerImpl implements ContactManager {
         }
 
         // Create a new past meeting
-        PastMeeting pastMeeting = new PastMeetingImpl(contactId, date, contacts, text);
+        PastMeeting pastMeeting = new PastMeetingImpl(contactId+1, date, contacts, text);
 
         // Increment the internal contact id count.
         contactId++;
